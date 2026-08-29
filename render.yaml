@@ -1,35 +1,34 @@
-services:
-  # 1. FastAPI Backend Web Service
-  - type: web
-    name: crisisops-api
-    runtime: python
-    region: oregon
-    plan: free
-    rootDir: backend
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
-    healthCheckPath: /api/health
-    envVars:
-      - key: ENV
-        value: production
-      - key: DEBUG
-        value: "False"
-      - key: DATABASE_URL
-        value: sqlite:///./crisisops.db
-      - key: CORS_ORIGINS
-        value: https://crisisops.onrender.com
+# 1. FastAPI Backend Web Service
+- type: web
+  name: crisisops-api
+  runtime: python
+  region: oregon
+  plan: free
+  rootDir: backend
+  buildCommand: pip install -r requirements.txt
+  startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+  healthCheckPath: /api/health
+  envVars:
+    - key: ENV
+      value: production
+    - key: DEBUG
+      value: "False"
+    - key: DATABASE_URL
+      value: sqlite:///./crisisops.db
+    - key: CORS_ORIGINS
+      value: '["https://crisisops.onrender.com"]'
 
-  # 2. React + Vite Frontend Static Site
-  - type: web
-    name: crisisops
-    runtime: static
-    rootDir: frontend
-    buildCommand: npm ci && npm run build
-    staticPublishPath: ./dist
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
-    envVars:
-      - key: VITE_API_URL
-        value: https://crisisops-api.onrender.com
+# 2. React + Vite Frontend Static Site
+- type: web
+  name: crisisops
+  runtime: static
+  rootDir: frontend
+  buildCommand: npm ci && npm run build
+  staticPublishPath: ./dist
+  routes:
+    - type: rewrite
+      source: /*
+      destination: /index.html
+  envVars:
+    - key: VITE_API_URL
+      value: https://crisisops-api.onrender.com
