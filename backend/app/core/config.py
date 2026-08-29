@@ -22,15 +22,22 @@ class Settings(BaseSettings):
     @classmethod
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
         if isinstance(v, str):
-            if v.startswith("[") and v.endswith("]"):
+            v_clean = v.strip()
+            if v_clean.startswith("[") and v_clean.endswith("]"):
                 try:
-                    return json.loads(v)
+                    parsed = json.loads(v_clean)
+                    if isinstance(parsed, list):
+                        return [str(item).strip() for item in parsed if str(item).strip()]
                 except Exception:
                     pass
-            return [i.strip() for i in v.split(",") if i.strip()]
+            return [i.strip() for i in v_clean.split(",") if i.strip()]
         elif isinstance(v, list):
-            return v
-        raise ValueError(v)
+            return [str(item).strip() for item in v if str(item).strip()]
+        return [
+            "http://localhost:5173",
+            "http://localhost:3000",
+            "http://127.0.0.1:5173",
+        ]
 
     model_config = SettingsConfigDict(
         env_file=".env",

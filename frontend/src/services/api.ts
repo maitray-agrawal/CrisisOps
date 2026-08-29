@@ -15,8 +15,9 @@ import {
   ReplayTimeline
 } from '../types';
 
-const rawApiUrl = (import.meta as any).env?.VITE_API_URL || '/api';
-const API_BASE = rawApiUrl.endsWith('/') ? rawApiUrl.slice(0, -1) : rawApiUrl;
+const rawApiUrl = ((import.meta as any).env?.VITE_API_URL || '/api').trim();
+const cleanUrl = rawApiUrl.endsWith('/') ? rawApiUrl.slice(0, -1) : rawApiUrl;
+const API_BASE = cleanUrl.endsWith('/api') ? cleanUrl : (cleanUrl === '' ? '/api' : `${cleanUrl}/api`);
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
@@ -109,7 +110,7 @@ export const apiService = {
   },
 
   async triggerDegradation(): Promise<any> {
-    const res = await fetch(`${API_BASE}/simulation/degrade-m204`, { method: 'POST' });
+    const res = await fetch(`${API_BASE}/simulation/trigger-degradation`, { method: 'POST' });
     return handleResponse(res);
   },
 
