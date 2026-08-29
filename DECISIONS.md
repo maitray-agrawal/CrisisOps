@@ -103,3 +103,19 @@ Implement `AuditLog` model in SQLite utilizing SHA-256 hash signatures where eac
 - Guarantees verifiable audit integrity against record tampering.
 - Enables high-impact incident post-mortem analysis and interactive time-travel playback during live demonstrations.
 
+---
+
+## ADR-008: Interactive 7-Act Judge Walkthrough Guide & Resilient State Reset
+
+### Context
+Demonstrating complex industrial AI pipelines to hackathon judges requires a structured, foolproof, 3-5 minute narrative that avoids UI desynchronization or accidental dead-ends.
+
+### Decision
+Embed an interactive 7-Act presentation guide (`DemoGuideModal.tsx`) directly into the application shell, triggered via a header action button (`🎯 Demo Guide`). Ensure `IncidentsPage.tsx` and all command tabs automatically recover gracefully when `reset_simulation()` is invoked.
+
+### Rationale
+- Provides a guided, polished presentation workflow for judges.
+- Eliminates risk of stale incident references or 404 errors during reset operations.
+- Highlights SHA-256 ledger integrity and real-time state transitions prominently.
+
+

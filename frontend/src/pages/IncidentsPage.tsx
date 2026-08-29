@@ -27,9 +27,19 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({ selectedIncidentId
       const data = await apiService.getIncidents();
       setIncidents(data);
 
-      const targetId = selectedIncidentId || (data.length > 0 ? data[0].id : null);
-      if (targetId) {
-        const detail = await apiService.getIncidentDetail(targetId);
+      if (data.length === 0) {
+        setActiveIncident(null);
+        setSop(null);
+        return;
+      }
+
+      // Verify if currently selected incident still exists (e.g. after simulation reset)
+      const validIncidentId = (selectedIncidentId && data.some(i => i.id === selectedIncidentId))
+        ? selectedIncidentId
+        : data[0].id;
+
+      try {
+        const detail = await apiService.getIncidentDetail(validIncidentId);
         setActiveIncident(detail);
 
         if (detail.action_recommendations && detail.action_recommendations.length > 0) {
@@ -42,6 +52,14 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({ selectedIncidentId
               // SOP optional fallback
             }
           }
+        }
+      } catch {
+        // Fallback if detail fetch fails
+        if (data.length > 0) {
+          const fallbackDetail = await apiService.getIncidentDetail(data[0].id);
+          setActiveIncident(fallbackDetail);
+        } else {
+          setActiveIncident(null);
         }
       }
     } catch (err: any) {

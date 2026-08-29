@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { apiService } from '../services/api';
+import { DemoGuideModal } from './DemoGuideModal';
 
 export type NavigationTab = 'dashboard' | 'incidents' | 'machines' | 'sops' | 'analytics' | 'alerts' | 'settings';
 
@@ -16,6 +17,8 @@ export const Layout: React.FC<LayoutProps> = ({
   children,
   activeIncidentCount = 1
 }) => {
+  const [isDemoGuideOpen, setIsDemoGuideOpen] = useState<boolean>(false);
+
   return (
     <div className="app-layout">
       {/* Sidebar Navigation */}
@@ -107,6 +110,15 @@ export const Layout: React.FC<LayoutProps> = ({
           <div className="top-header-actions">
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginRight: '8px' }}>
               <button
+                className="btn btn-primary"
+                style={{ fontSize: '0.75rem', padding: '4px 12px', height: '32px', background: 'linear-gradient(135deg, #06b6d4, #0284c7)', color: '#fff', border: 'none', fontWeight: 700 }}
+                onClick={() => setIsDemoGuideOpen(true)}
+                title="Launch Judge Demo Walkthrough Guide (7-Act Crisis Flow)"
+              >
+                🎯 Demo Guide
+              </button>
+
+              <button
                 className="btn btn-danger"
                 style={{ fontSize: '0.75rem', padding: '4px 10px', height: '32px' }}
                 onClick={async () => {
@@ -143,13 +155,24 @@ export const Layout: React.FC<LayoutProps> = ({
               </button>
             </div>
 
-            <div className="system-online-badge">
+            <div className="system-online-badge" style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
               <span className="pulsate-dot"></span>
               <span>SYSTEM ONLINE</span>
             </div>
 
-            <div style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--border-color)', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-              🔔
+            <div style={{
+              background: 'rgba(6, 182, 212, 0.1)',
+              border: '1px solid rgba(6, 182, 212, 0.3)',
+              color: 'var(--accent-cyan)',
+              fontSize: '0.7rem',
+              fontWeight: 700,
+              padding: '4px 8px',
+              borderRadius: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}>
+              <span>🛡️ SHA-256 LEDGER ACTIVE</span>
             </div>
 
             <div className="operator-profile">
@@ -167,7 +190,18 @@ export const Layout: React.FC<LayoutProps> = ({
           {children}
         </main>
       </div>
+
+      {/* Demo Guide Walkthrough Modal */}
+      <DemoGuideModal
+        isOpen={isDemoGuideOpen}
+        onClose={() => setIsDemoGuideOpen(false)}
+        onNavigateToTab={(tab) => {
+          onSelectTab(tab);
+          // Allow tab navigation without closing modal if desired or auto-close
+        }}
+      />
     </div>
   );
 };
+
 

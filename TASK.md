@@ -104,4 +104,18 @@
   - [x] Validate `pytest` pass rate (30/30 passed)
   - [x] Validate `npm run build` with zero errors
 
+## Phase 6: Demo Hardening + Mission Control Experience (COMPLETED)
+- [x] 6A: Demo Reliability & Fallback Verification
+  - [x] Ensure `reset_simulation()` cleanly clears all active/stale state
+  - [x] Verify deterministic fallback execution during 7-Act presentation
+- [x] 6B: Global State Synchronization & Polling
+  - [x] Ensure instant event-driven UI updates across all active pages on simulation events
+- [x] 6C: Operator Experience & UI Polish
+  - [x] Polish status badges, KPI cards, and critical spotlight banner
+- [x] 6D: Interactive Judge Demo Guide
+  - [x] Create `DemoGuideModal.tsx` walkthrough wizard for the 7-Act Crisis Scenario
+- [x] 6E: End-to-End Test & Verification
+  - [x] Verify 30/30 pytest tests
+  - [x] Verify `npm run build` with zero errors
+
 

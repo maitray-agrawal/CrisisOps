@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.5.0] - 2026-08-29
+### Added
+- **Interactive Judge Demo Walkthrough Guide**: Created `DemoGuideModal.tsx` providing a 7-Act interactive walkthrough wizard for live hackathon presentations.
+- **Header Command Bar & Status Badges**: Integrated `🎯 Demo Guide` action button, quick simulation action buttons, and `🛡️ SHA-256 LEDGER ACTIVE` status badge in `Layout.tsx`.
+- **Global State Synchronization & Resilient Reset**: Updated `IncidentsPage.tsx` with graceful fallback handling to ensure zero UI desynchronization or broken state on simulation reset.
+- **Verification Suite**: 30/30 backend unit tests passing (`pytest`); `npm run build` Vite production build passing cleanly in 609ms with 0 errors.
+
 ## [v0.4.0] - 2026-08-29
 ### Added
 - **Cryptographic Decision Ledger**: Implemented `AuditLog` database model with SHA-256 hash chaining (`previous_hash` -> `current_hash`) and integrity verification in `audit_service.py`.
