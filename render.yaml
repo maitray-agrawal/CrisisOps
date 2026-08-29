@@ -17,7 +17,7 @@ services:
       - key: DATABASE_URL
         value: sqlite:///./crisisops.db
       - key: CORS_ORIGINS
-        value: https://crisisops-frontend.onrender.com
+        value: https://crisisops.onrender.com
 
   # 2. React + Vite Frontend Static Site
   - type: web
@@ -32,4 +32,4 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        value: https://crisisops-backend.onrender.com
+        value: https://crisisops-api.onrender.com
