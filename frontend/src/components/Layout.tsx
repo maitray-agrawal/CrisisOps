@@ -110,7 +110,7 @@ export const Layout: React.FC<LayoutProps> = ({
                 className="btn btn-danger"
                 style={{ fontSize: '0.75rem', padding: '4px 10px', height: '32px' }}
                 onClick={async () => {
-                  await apiService.triggerM204Degradation();
+                  await apiService.triggerDegradation();
                   window.dispatchEvent(new Event('simulation-updated'));
                 }}
                 title="Trigger M-204 bearing degradation simulation scenario"
@@ -122,7 +122,7 @@ export const Layout: React.FC<LayoutProps> = ({
                 className="btn btn-secondary"
                 style={{ fontSize: '0.75rem', padding: '4px 10px', height: '32px' }}
                 onClick={async () => {
-                  await apiService.stepSimulation();
+                  await apiService.triggerSimulationTick();
                   window.dispatchEvent(new Event('simulation-updated'));
                 }}
                 title="Advance telemetry simulation stream by 1 step"

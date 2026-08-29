@@ -87,8 +87,44 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({ selectedIncidentId
     }
   };
 
-  const handleApproveAction = (actionId: string) => {
-    setApprovedActionIds(prev => ({ ...prev, [actionId]: true }));
+  const [investigating, setInvestigating] = useState<boolean>(false);
+  const [executing, setExecuting] = useState<boolean>(false);
+
+  const handleRunInvestigation = async (id: string) => {
+    setInvestigating(true);
+    setError(null);
+    try {
+      await apiService.triggerInvestigation(id);
+      await fetchIncidentsData(false);
+    } catch (err: any) {
+      setError(err.message || 'Investigation pipeline failed.');
+    } finally {
+      setInvestigating(false);
+    }
+  };
+
+  const handleApproveAction = async (actionId: string, incidentId: string) => {
+    try {
+      await apiService.approvePlan(incidentId, 'Lead Industrial Operator');
+      setApprovedActionIds(prev => ({ ...prev, [actionId]: true }));
+      await fetchIncidentsData(false);
+    } catch (err: any) {
+      setError(err.message || 'Approval failed.');
+    }
+  };
+
+  const handleExecuteActuation = async (incidentId: string) => {
+    setExecuting(true);
+    setError(null);
+    try {
+      await apiService.executeActuation(incidentId);
+      window.dispatchEvent(new Event('simulation-updated'));
+      await fetchIncidentsData(false);
+    } catch (err: any) {
+      setError(err.message || 'Actuation execution failed.');
+    } finally {
+      setExecuting(false);
+    }
   };
 
   if (loading && !activeIncident) return <LoadingSpinner message="Correlating telemetry signals & AI agent reasoning chain..." />;
@@ -102,7 +138,17 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({ selectedIncidentId
           <h1 className="page-title">AI Incident Investigation & Root Cause Workspace</h1>
           <p className="page-subtitle">Multi-Agent AI Telemetry Correlation, Root Cause Hypothesis & Action Plan Verification</p>
         </div>
-        <div>
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          {activeIncident && (
+            <button
+              className="btn btn-primary"
+              disabled={investigating}
+              onClick={() => handleRunInvestigation(activeIncident.id)}
+              style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+            >
+              {investigating ? '🤖 Running Agents...' : '⚡ Run 4-Stage AI Pipeline'}
+            </button>
+          )}
           <button className="btn btn-outline" onClick={() => fetchIncidentsData(true)} style={{ fontSize: '0.8rem' }}>
             🔄 Refresh Agent Stream
           </button>
@@ -132,7 +178,7 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({ selectedIncidentId
                 </div>
                 <div style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.35rem', color: '#fff' }}>{incident.title}</div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  Asset: <span className="mono">{incident.machine_id}</span> • Status: {incident.status}
+                  Asset: <span className="mono">{incident.machine_id}</span> • Status: <strong style={{ color: incident.status === 'CONTAINED' ? 'var(--status-normal)' : 'var(--status-warning)' }}>{incident.status}</strong>
                 </div>
               </div>
             );
@@ -159,11 +205,11 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({ selectedIncidentId
                 </div>
                 <div className="pipeline-stage active">
                   <div className="stage-step">4</div>
-                  <span>SOP Matching</span>
+                  <span>SOP RAG Retrieval</span>
                 </div>
-                <div className="pipeline-stage pending">
+                <div className={`pipeline-stage ${activeIncident.status === 'CONTAINED' ? 'active' : 'pending'}`}>
                   <div className="stage-step">5</div>
-                  <span>Human Action</span>
+                  <span>Containment Executed</span>
                 </div>
               </div>
             </div>
@@ -174,7 +220,7 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({ selectedIncidentId
                 <div>
                   <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.4rem' }}>
                     <span className={`badge badge-${activeIncident.severity.toLowerCase()}`}>{activeIncident.severity}</span>
-                    <span className="badge badge-normal" style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', borderColor: 'rgba(59, 130, 246, 0.4)' }}>
+                    <span className="badge badge-normal" style={{ background: activeIncident.status === 'CONTAINED' ? 'rgba(34,197,94,0.15)' : 'rgba(59, 130, 246, 0.15)', color: activeIncident.status === 'CONTAINED' ? '#4ade80' : '#60a5fa', borderColor: activeIncident.status === 'CONTAINED' ? 'rgba(34,197,94,0.4)' : 'rgba(59, 130, 246, 0.4)' }}>
                       STATUS: {activeIncident.status}
                     </span>
                     <span className="mono" style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{activeIncident.id}</span>
@@ -184,13 +230,44 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({ selectedIncidentId
                     Target Machine: <strong style={{ color: '#fff' }}>{activeIncident.machine_id}</strong> • Opened: {new Date(activeIncident.created_at).toLocaleString()}
                   </p>
                 </div>
+                {activeIncident.status === 'APPROVED' && (
+                  <button
+                    className="btn btn-primary"
+                    disabled={executing}
+                    onClick={() => handleExecuteActuation(activeIncident.id)}
+                    style={{ background: 'linear-gradient(135deg, #10b981, #059669)', borderColor: '#10b981', boxShadow: '0 0 15px rgba(16, 185, 129, 0.4)' }}
+                  >
+                    {executing ? 'Executing Actuation...' : '⚡ Execute Containment Action'}
+                  </button>
+                )}
               </div>
 
               <div style={{ background: 'var(--bg-surface-elevated)', padding: '1rem', borderRadius: 'var(--radius-md)', borderLeft: '3px solid var(--accent-cyan)' }}>
                 <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent-cyan)', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
-                  🤖 AI AGENT INCIDENT EXECUTIVE SUMMARY
+                  🤖 MULTI-AGENT SYNTHESIZED INCIDENT SUMMARY
                 </div>
-                <p style={{ fontSize: '0.9rem', color: 'var(--text-bright)', lineHeight: '1.5', margin: 0 }}>{activeIncident.summary}</p>
+                <p style={{ fontSize: '0.9rem', color: 'var(--text-bright)', lineHeight: '1.5', margin: 0 }}>{activeIncident.summary || 'Click "Run 4-Stage AI Pipeline" to trigger complete agent correlation.'}</p>
+              </div>
+            </div>
+
+            {/* Estimated Business Impact Metrics */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+              <div className="card" style={{ padding: '1rem' }}>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>Est. Production Downtime</div>
+                <div className="mono" style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--status-warning)', marginTop: '0.25rem' }}>24.0 Hours</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>35% Plant Capacity Loss</div>
+              </div>
+              <div className="card" style={{ padding: '1rem' }}>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>Est. Financial Risk</div>
+                <div className="mono" style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--status-critical)', marginTop: '0.25rem' }}>$45,000 USD</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>Direct & Overhead Impact</div>
+              </div>
+              <div className="card" style={{ padding: '1rem' }}>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>Safety Risk Rating</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.25rem' }}>
+                  <span className="badge badge-critical" style={{ fontSize: '1.1rem', padding: '0.2rem 0.75rem' }}>HIGH RISK</span>
+                </div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>Thermal Isolation Required</div>
               </div>
             </div>
 
@@ -236,10 +313,10 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({ selectedIncidentId
               <div className="card">
                 <div className="card-title">
                   <span>Recommended Action Plan</span>
-                  <span className="badge badge-critical" style={{ fontSize: '0.7rem' }}>HUMAN-IN-THE-LOOP REQUIRED</span>
+                  <span className="badge badge-critical" style={{ fontSize: '0.7rem' }}>HUMAN-IN-THE-LOOP GATE</span>
                 </div>
                 {activeIncident.action_recommendations?.map((act) => {
-                  const isApproved = approvedActionIds[act.id] || act.human_approved;
+                  const isApproved = approvedActionIds[act.id] || act.human_approved || activeIncident.status === 'APPROVED' || activeIncident.status === 'CONTAINED';
                   return (
                     <div key={act.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                       <div style={{ background: isApproved ? 'rgba(34, 197, 94, 0.05)' : 'rgba(239, 68, 68, 0.05)', border: `1px solid ${isApproved ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`, padding: '1rem', borderRadius: 'var(--radius-md)' }}>
@@ -257,12 +334,28 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({ selectedIncidentId
                             className={`btn ${isApproved ? 'btn-outline' : 'btn-primary'}`}
                             style={{ fontSize: '0.78rem', padding: '0.38rem 0.85rem' }}
                             disabled={isApproved}
-                            onClick={() => handleApproveAction(act.id)}
+                            onClick={() => handleApproveAction(act.id, activeIncident.id)}
                           >
-                            {isApproved ? 'Authorized ✓' : 'Approve & Execute Plan'}
+                            {isApproved ? 'Authorized ✓' : 'Approve Plan'}
                           </button>
                         </div>
                       </div>
+
+                      {isApproved && activeIncident.status !== 'CONTAINED' && (
+                        <button
+                          className="btn btn-primary"
+                          disabled={executing}
+                          onClick={() => handleExecuteActuation(activeIncident.id)}
+                          style={{
+                            marginTop: '0.5rem',
+                            background: 'linear-gradient(135deg, #10b981, #059669)',
+                            borderColor: '#10b981',
+                            boxShadow: '0 0 15px rgba(16, 185, 129, 0.4)'
+                          }}
+                        >
+                          {executing ? 'Executing Actuation...' : '⚡ Execute Containment Action'}
+                        </button>
+                      )}
                     </div>
                   );
                 })}
@@ -271,7 +364,7 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({ selectedIncidentId
               {/* Retrieved SOP */}
               <div className="card">
                 <div className="card-title">
-                  <span>Matched SOP Protocol</span>
+                  <span>Matched SOP Protocol (RAG Engine)</span>
                   {sop && <span className="mono" style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)' }}>{sop.sop_code}</span>}
                 </div>
                 {sop ? (

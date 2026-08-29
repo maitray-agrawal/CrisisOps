@@ -98,18 +98,47 @@ export const apiService = {
     return handleResponse(res);
   },
 
-  async stepSimulation(): Promise<any> {
+  async triggerSimulationTick(): Promise<any> {
     const res = await fetch(`${API_BASE}/simulation/tick`, { method: 'POST' });
     return handleResponse(res);
   },
 
-  async triggerM204Degradation(): Promise<any> {
-    const res = await fetch(`${API_BASE}/simulation/trigger-degradation`, { method: 'POST' });
+  async triggerDegradation(): Promise<any> {
+    const res = await fetch(`${API_BASE}/simulation/degrade-m204`, { method: 'POST' });
     return handleResponse(res);
   },
 
   async resetSimulation(): Promise<any> {
     const res = await fetch(`${API_BASE}/simulation/reset`, { method: 'POST' });
+    return handleResponse(res);
+  },
+
+  // AI Agent Pipeline & Actuation
+  async triggerInvestigation(incidentId: string): Promise<any> {
+    const res = await fetch(`${API_BASE}/incidents/${encodeURIComponent(incidentId)}/investigate`, {
+      method: 'POST'
+    });
+    return handleResponse(res);
+  },
+
+  async getInvestigation(incidentId: string): Promise<any> {
+    const res = await fetch(`${API_BASE}/incidents/${encodeURIComponent(incidentId)}/investigation`);
+    return handleResponse(res);
+  },
+
+  async approvePlan(incidentId: string, operatorName = 'Lead Industrial Operator'): Promise<any> {
+    const res = await fetch(`${API_BASE}/incidents/${encodeURIComponent(incidentId)}/approve`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ operator_name: operatorName })
+    });
+    return handleResponse(res);
+  },
+
+  async executeActuation(incidentId: string): Promise<any> {
+    const res = await fetch(`${API_BASE}/incidents/${encodeURIComponent(incidentId)}/execute-actuation`, {
+      method: 'POST'
+    });
     return handleResponse(res);
   }
 };

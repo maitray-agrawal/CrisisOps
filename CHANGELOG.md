@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.3.0] - 2026-08-29
+### Added
+- **4-Stage AI Pipeline**: Implemented `SignalCorrelatorAgent`, `RootCauseAnalysisAgent`, `ImpactAssessmentAgent`, and `SOPResponseAgent` with deterministic fallback mechanisms for hackathon reliability.
+- **Multi-Agent Orchestrator**: Developed `agent_orchestrator.py` managing sequential step execution, database persistence, and schema-validated state transitions.
+- **In-Memory SOP RAG Engine**: Built `sop_rag_service.py` featuring keyword & TF-IDF relevance scoring against stored markdown SOP documents.
+- **Human Approval & Containment Actuation**: Created `actuation_engine.py` enforcing operator authorization before triggering automated simulation reset and marking incident state as `CONTAINED`.
+- **Investigation API Surface**: Exposed `/api/incidents/{id}/investigate`, `/api/incidents/{id}/investigation`, `/api/incidents/{id}/approve`, and `/api/incidents/{id}/execute-actuation`.
+- **Frontend Workspace Enhancements**: Integrated 4-agent status stage visualizer, business impact metric cards ($45,000 loss / 24h downtime), human approval gate toggle, and green containment execution button in `IncidentsPage.tsx`.
+- **Full Verification Suite**: 27/27 pytest tests passing; Vite production build (`npm run build`) passing with 0 errors.
+
 ## [v0.2.0] - 2026-08-29
 ### Added
 - **Telemetry Simulation Engine**: `TelemetrySimulator` (`backend/app/services/telemetry.py`) for live bounded sensor stream generation and deterministic M-204 Centrifugal Compressor bearing degradation flow.

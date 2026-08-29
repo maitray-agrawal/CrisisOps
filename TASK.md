@@ -54,8 +54,34 @@
 - [x] 3H: Documentation & Git Checkpoint
   - [x] Update `STATE.md`, `TASK.md`, `CHANGELOG.md`, `DECISIONS.md`
 
-## Phase 4: AI Root Cause + SOP Intelligence (NEXT PHASE)
-- [ ] Implement LLM/LangChain multi-agent workflow
-- [ ] Implement SOP RAG retriever
-- [ ] Implement Root Cause synthesis and automated action recommendations
+## Phase 4: AI Root Cause, SOP Intelligence & Human Approval Gate (IN PLANNING)
+- [ ] 4A: Sequential AI Agent Engine (`backend/app/agents/`)
+  - [ ] Implement Agent 1: Signal Correlator Agent (`signal_agent.py`) with Pydantic output validation
+  - [ ] Implement Agent 2: Root Cause Analysis (RCA) Agent (`rca_agent.py`) with maintenance correlation
+  - [ ] Implement Agent 3: Impact Assessment Agent (`impact_agent.py`) calculating financial & downtime risk
+  - [ ] Implement Agent 4: SOP Retrieval & Action Recommendation Agent (`sop_agent.py`)
+  - [ ] Implement Agent Fallback Engine for instantaneous rule-based execution if LLM fails/times out
+- [ ] 4B: In-Memory SOP RAG Retriever (`backend/app/services/sop_rag_service.py`)
+  - [ ] Implement TF-IDF / keyword similarity matcher over database SOP documents & markdown catalog
+  - [ ] Expose sub-millisecond SOP document search endpoint
+- [ ] 4C: Multi-Agent Orchestrator Service (`backend/app/services/agent_orchestrator.py`)
+  - [ ] Pipeline orchestrator coordinating Agents 1-4
+  - [ ] Database persistence of hypotheses, impact reports, and response plans
+- [ ] 4D: Human Approval Gate & Actuation Engine (`backend/app/services/actuation_engine.py`)
+  - [ ] Implement Human Approval lock (`approve_plan`)
+  - [ ] Implement simulated actuation execution (`execute_actuation`): update machine status to `CONTAINED`, reset M-204 telemetry baseline, resolve incident ticket
+- [ ] 4E: Investigation API Endpoints (`backend/app/api/investigation.py`)
+  - [ ] Expose `POST /api/incidents/{id}/investigate`
+  - [ ] Expose `GET /api/incidents/{id}/investigation`
+  - [ ] Expose `POST /api/incidents/{id}/approve`
+  - [ ] Expose `POST /api/incidents/{id}/execute-actuation`
+- [ ] 4F: Frontend Incidents Workspace Integration (`frontend/src/`)
+  - [ ] Render Root Cause Hypothesis card with confidence gauge
+  - [ ] Render correlated evidence checklist & maintenance history badges
+  - [ ] Render Business Impact card ($45k potential loss, 24h downtime)
+  - [ ] Render SOP Action Plan steps with Human Approval Gate toggle & Execute Containment Action trigger
+- [ ] 4G: Pytest Suite & Build Verification (`backend/tests/test_agent_pipeline.py`)
+  - [ ] Write unit tests for agent pipeline, fallback engine, RAG search, and actuation execution
+  - [ ] Validate `pytest` pass rate
+  - [ ] Validate `npm run build` with zero errors
 
