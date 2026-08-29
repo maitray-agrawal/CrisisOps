@@ -15,7 +15,8 @@ import {
   ReplayTimeline
 } from '../types';
 
-const API_BASE = (import.meta as any).env?.VITE_API_URL || '/api';
+const rawApiUrl = (import.meta as any).env?.VITE_API_URL || '/api';
+const API_BASE = rawApiUrl.endsWith('/') ? rawApiUrl.slice(0, -1) : rawApiUrl;
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {

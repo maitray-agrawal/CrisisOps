@@ -1,11 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.core.database import engine, Base
+from app.core.database import engine, Base, SessionLocal
+from app.db.seed import seed_database_if_empty
 from app.api import health, machines, incidents, sops, simulation, investigation, audit
 
 # Create Database tables automatically on startup if not present
 Base.metadata.create_all(bind=engine)
+
+# Idempotent demo database seeding for clean deployment
+with SessionLocal() as db_session:
+    seed_database_if_empty(db_session)
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -15,11 +20,14 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# Configure CORS Middleware for local frontend development
+# Configure CORS Middleware for local development and Render production
+cors_origins = [str(o) for o in settings.CORS_ORIGINS]
+allow_creds = False if "*" in cors_origins else True
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
-    allow_credentials=True,
+    allow_origins=cors_origins,
+    allow_credentials=allow_creds,
     allow_methods=["*"],
     allow_headers=["*"],
 )
