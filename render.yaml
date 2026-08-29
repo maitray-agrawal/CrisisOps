@@ -17,14 +17,14 @@ services:
       - key: DATABASE_URL
         value: sqlite:///./crisisops.db
       - key: CORS_ORIGINS
-        value: "*"
+        value: https://crisisops-frontend.onrender.com
 
   # 2. React + Vite Frontend Static Site
   - type: web
     name: crisisops-frontend
     runtime: static
     rootDir: frontend
-    buildCommand: npm install && npm run build
+    buildCommand: npm ci && npm run build
     staticPublishPath: ./dist
     routes:
       - type: rewrite
@@ -32,7 +32,4 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: crisisops-backend
-          property: url
+        value: https://crisisops-backend.onrender.com
