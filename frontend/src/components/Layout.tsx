@@ -1,8 +1,10 @@
 import React from 'react';
 
+export type NavigationTab = 'dashboard' | 'incidents' | 'machines' | 'sops' | 'analytics' | 'alerts' | 'settings';
+
 interface LayoutProps {
-  currentTab: 'dashboard' | 'incidents' | 'machines';
-  onSelectTab: (tab: 'dashboard' | 'incidents' | 'machines') => void;
+  currentTab: NavigationTab;
+  onSelectTab: (tab: NavigationTab) => void;
   children: React.ReactNode;
   activeIncidentCount?: number;
 }
@@ -14,46 +16,119 @@ export const Layout: React.FC<LayoutProps> = ({
   activeIncidentCount = 1
 }) => {
   return (
-    <div className="app-container">
-      <header className="navbar">
-        <div className="brand">
-          <div className="brand-logo">CO</div>
+    <div className="app-layout">
+      {/* Sidebar Navigation */}
+      <aside className="sidebar">
+        <div className="sidebar-header">
+          <div className="sidebar-logo">CO</div>
           <div>
-            <div className="brand-title">Industrial CrisisOps</div>
-            <div className="brand-subtitle">AI Incident Investigation & Response Platform</div>
+            <div className="sidebar-brand-title">CrisisOps</div>
+            <div className="sidebar-brand-sub">AI Command Center</div>
           </div>
         </div>
 
-        <nav className="nav-links">
+        <nav className="sidebar-nav">
+          <div className="nav-section-title">Core Operations</div>
+          
           <button
-            className={`nav-button ${currentTab === 'dashboard' ? 'active' : ''}`}
+            className={`sidebar-item ${currentTab === 'dashboard' ? 'active' : ''}`}
             onClick={() => onSelectTab('dashboard')}
           >
-            Dashboard
+            <span><span className="item-icon">📊</span> Overview</span>
           </button>
+
           <button
-            className={`nav-button ${currentTab === 'incidents' ? 'active' : ''}`}
+            className={`sidebar-item ${currentTab === 'incidents' ? 'active' : ''}`}
             onClick={() => onSelectTab('incidents')}
           >
-            Incidents {activeIncidentCount > 0 && <span style={{ marginLeft: '4px', padding: '1px 6px', background: '#ef4444', color: '#fff', borderRadius: '10px', fontSize: '0.7rem' }}>{activeIncidentCount}</span>}
+            <span><span className="item-icon">🚨</span> Incidents</span>
+            {activeIncidentCount > 0 && (
+              <span className="sidebar-item-badge">{activeIncidentCount}</span>
+            )}
           </button>
+
           <button
-            className={`nav-button ${currentTab === 'machines' ? 'active' : ''}`}
+            className={`sidebar-item ${currentTab === 'machines' ? 'active' : ''}`}
             onClick={() => onSelectTab('machines')}
           >
-            Machines & Telemetry
+            <span><span className="item-icon">⚡</span> Fleet & Telemetry</span>
+          </button>
+
+          <div className="nav-section-title">Intelligence & SOPs</div>
+
+          <button
+            className={`sidebar-item ${currentTab === 'sops' ? 'active' : ''}`}
+            onClick={() => onSelectTab('sops')}
+          >
+            <span><span className="item-icon">📖</span> SOP Knowledge</span>
+          </button>
+
+          <button
+            className={`sidebar-item ${currentTab === 'analytics' ? 'active' : ''}`}
+            onClick={() => onSelectTab('analytics')}
+          >
+            <span><span className="item-icon">📈</span> Predictive Analytics</span>
+          </button>
+
+          <button
+            className={`sidebar-item ${currentTab === 'alerts' ? 'active' : ''}`}
+            onClick={() => onSelectTab('alerts')}
+          >
+            <span><span className="item-icon">🔔</span> Anomaly Feeds</span>
+          </button>
+
+          <div className="nav-section-title">System</div>
+
+          <button
+            className={`sidebar-item ${currentTab === 'settings' ? 'active' : ''}`}
+            onClick={() => onSelectTab('settings')}
+          >
+            <span><span className="item-icon">⚙️</span> Control Config</span>
           </button>
         </nav>
 
-        <div className="system-status">
-          <span className="status-dot"></span>
-          <span>SYSTEM ONLINE</span>
+        <div className="sidebar-footer">
+          <div style={{ color: 'var(--text-bright)', fontWeight: 600 }}>Plant B — Main Line</div>
+          <div style={{ fontSize: '0.7rem', marginTop: '2px' }}>Mode: AI Human-in-the-Loop</div>
         </div>
-      </header>
+      </aside>
 
-      <main className="main-content">
-        {children}
-      </main>
+      {/* Main Wrapper */}
+      <div className="main-wrapper">
+        {/* Top Header Bar */}
+        <header className="top-header">
+          <div className="search-box">
+            <span>🔍</span>
+            <input type="text" placeholder="Search machines, telemetry logs, or incidents..." readOnly />
+            <span className="search-shortcut">⌘K</span>
+          </div>
+
+          <div className="top-header-actions">
+            <div className="system-online-badge">
+              <span className="pulsate-dot"></span>
+              <span>SYSTEM ONLINE</span>
+            </div>
+
+            <div style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--border-color)', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              🔔
+            </div>
+
+            <div className="operator-profile">
+              <div className="avatar-circle">OP</div>
+              <div>
+                <div style={{ fontWeight: 600, fontSize: '0.82rem', color: '#fff' }}>Shift Lead</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Site Operator #42</div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Page View Container */}
+        <main style={{ flex: 1 }}>
+          {children}
+        </main>
+      </div>
     </div>
   );
 };
+
