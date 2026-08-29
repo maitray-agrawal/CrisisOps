@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { apiService } from '../services/api';
 
 interface DemoGuideModalProps {
@@ -97,7 +97,51 @@ export const DemoGuideModal: React.FC<DemoGuideModalProps> = ({
   onNavigateToTab
 }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
+  const [activeTab, setActiveTab] = useState<'walkthrough' | 'pitch'>('walkthrough');
   const [actionLoading, setActionLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'SELECT' ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+
+      if (e.key === 'ArrowLeft') {
+        setCurrentStepIndex((prev) => Math.max(0, prev - 1));
+        return;
+      }
+
+      if (e.key === 'ArrowRight') {
+        setCurrentStepIndex((prev) => Math.min(DEMO_STEPS.length - 1, prev + 1));
+        return;
+      }
+
+      if (e.key >= '1' && e.key <= '7') {
+        const actNum = parseInt(e.key, 10);
+        setCurrentStepIndex(actNum - 1);
+        setActiveTab('walkthrough');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -128,46 +172,58 @@ export const DemoGuideModal: React.FC<DemoGuideModalProps> = ({
   };
 
   return (
-    <div className="modal-backdrop" onClick={onClose} style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(5, 10, 20, 0.85)',
-      backdropFilter: 'blur(8px)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 99999
-    }}>
-      <div className="modal-card" onClick={e => e.stopPropagation()} style={{
-        background: 'var(--bg-card)',
-        border: '1px solid var(--border-color)',
-        borderRadius: '12px',
-        width: '90%',
-        maxWidth: '680px',
-        boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)',
-        overflow: 'hidden'
-      }}>
+    <div
+      className="modal-backdrop"
+      onClick={onClose}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'rgba(5, 10, 20, 0.85)',
+        backdropFilter: 'blur(8px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 99999
+      }}
+    >
+      <div
+        className="modal-card"
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-color)',
+          borderRadius: '12px',
+          width: '90%',
+          maxWidth: '700px',
+          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)',
+          overflow: 'hidden'
+        }}
+      >
         {/* Modal Header */}
-        <div style={{
-          background: 'linear-gradient(90deg, rgba(6, 182, 212, 0.15), rgba(15, 23, 42, 0.9))',
-          padding: '1.25rem 1.5rem',
-          borderBottom: '1px solid var(--border-color)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
+        <div
+          style={{
+            background: 'linear-gradient(90deg, rgba(6, 182, 212, 0.15), rgba(15, 23, 42, 0.95))',
+            padding: '1.15rem 1.5rem',
+            borderBottom: '1px solid var(--border-color)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{
-              background: 'var(--accent-cyan)',
-              color: '#000',
-              fontWeight: 800,
-              borderRadius: '6px',
-              padding: '2px 8px',
-              fontSize: '0.8rem'
-            }}>
+            <div
+              style={{
+                background: 'var(--accent-cyan)',
+                color: '#000',
+                fontWeight: 800,
+                borderRadius: '6px',
+                padding: '2px 8px',
+                fontSize: '0.8rem'
+              }}
+            >
               ACT {currentStep.act} / 7
             </div>
             <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#fff', fontWeight: 700 }}>
@@ -188,99 +244,225 @@ export const DemoGuideModal: React.FC<DemoGuideModalProps> = ({
           </button>
         </div>
 
-        {/* Modal Body */}
-        <div style={{ padding: '1.5rem' }}>
-          <div style={{ fontSize: '0.8rem', color: 'var(--accent-cyan)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.25rem' }}>
-            {currentStep.subtitle}
-          </div>
-          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#fff', margin: '0 0 1rem 0' }}>
-            {currentStep.title}
-          </h2>
-
-          <p style={{ color: '#cbd5e1', fontSize: '0.92rem', lineHeight: '1.6', marginBottom: '1.25rem' }}>
-            {currentStep.description}
-          </p>
-
-          <div style={{
-            background: 'rgba(15, 23, 42, 0.8)',
-            border: '1px solid var(--border-color)',
-            borderLeft: '4px solid var(--accent-cyan)',
-            borderRadius: '6px',
-            padding: '0.9rem 1.1rem',
-            marginBottom: '1.5rem',
-            fontFamily: 'monospace',
-            fontSize: '0.85rem',
-            color: 'var(--accent-cyan)'
-          }}>
-            🎯 <strong>Key Demo Focus:</strong> {currentStep.keyMetric}
-          </div>
-
-          {/* Action Trigger Button */}
-          {currentStep.actionText && (
-            <div style={{ marginBottom: '1.5rem' }}>
-              <button
-                className="btn btn-primary"
-                onClick={handleStepAction}
-                disabled={actionLoading}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem 1.25rem',
-                  fontSize: '0.95rem',
-                  fontWeight: 700,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.5rem'
-                }}
-              >
-                {actionLoading ? 'Executing Step Action...' : currentStep.actionText}
-              </button>
-            </div>
-          )}
-
-          {/* Step Navigation Controls */}
-          <div style={{
+        {/* Tab Switcher & Keyboard Hint */}
+        <div
+          style={{
+            padding: '0.65rem 1.5rem',
+            background: 'rgba(0, 0, 0, 0.3)',
+            borderBottom: '1px solid var(--border-color)',
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'center',
-            paddingTop: '1rem',
-            borderTop: '1px solid var(--border-color)'
-          }}>
+            alignItems: 'center'
+          }}
+        >
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
             <button
-              className="btn btn-outline"
-              disabled={currentStepIndex === 0}
-              onClick={() => setCurrentStepIndex(prev => Math.max(0, prev - 1))}
-              style={{ opacity: currentStepIndex === 0 ? 0.4 : 1 }}
+              onClick={() => setActiveTab('walkthrough')}
+              className={`btn ${activeTab === 'walkthrough' ? 'btn-primary' : 'btn-outline'}`}
+              style={{ fontSize: '0.75rem', padding: '0.3rem 0.75rem' }}
             >
-              ⬅️ Previous Act
+              🎬 7-Act Script
             </button>
-
-            <div style={{ display: 'flex', gap: '6px' }}>
-              {DEMO_STEPS.map((_, idx) => (
-                <div
-                  key={idx}
-                  onClick={() => setCurrentStepIndex(idx)}
-                  style={{
-                    width: '10px',
-                    height: '10px',
-                    borderRadius: '50%',
-                    background: idx === currentStepIndex ? 'var(--accent-cyan)' : 'rgba(255, 255, 255, 0.2)',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
-                  }}
-                />
-              ))}
-            </div>
-
             <button
-              className="btn btn-primary"
-              disabled={currentStepIndex === DEMO_STEPS.length - 1}
-              onClick={() => setCurrentStepIndex(prev => Math.min(DEMO_STEPS.length - 1, prev + 1))}
-              style={{ opacity: currentStepIndex === DEMO_STEPS.length - 1 ? 0.4 : 1 }}
+              onClick={() => setActiveTab('pitch')}
+              className={`btn ${activeTab === 'pitch' ? 'btn-primary' : 'btn-outline'}`}
+              style={{ fontSize: '0.75rem', padding: '0.3rem 0.75rem' }}
             >
-              Next Act ➡️
+              🏆 JUDGE PITCH & ARCHITECTURE
             </button>
           </div>
+
+          <div className="mono" style={{ fontSize: '0.7rem', color: 'var(--accent-cyan)' }}>
+            ⌨️ Keys <strong style={{ color: '#fff' }}>[1–7]</strong> Act • <strong style={{ color: '#fff' }}>[←/→]</strong> Nav • <strong style={{ color: '#fff' }}>[Esc]</strong> Close
+          </div>
+        </div>
+
+        {/* Modal Body */}
+        <div style={{ padding: '1.5rem' }}>
+          {activeTab === 'pitch' ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              {/* Product Positioning */}
+              <div
+                style={{
+                  background: 'var(--bg-surface-elevated)',
+                  border: '1px solid var(--border-color)',
+                  borderLeft: '4px solid var(--accent-cyan)',
+                  borderRadius: '8px',
+                  padding: '1.15rem'
+                }}
+              >
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>
+                  🎯 VALUE PROPOSITION & JUDGE PITCH
+                </div>
+                <p style={{ fontSize: '0.98rem', color: '#fff', lineHeight: '1.55', margin: 0, fontWeight: 500 }}>
+                  "Industrial CrisisOps is the mission-control AI platform that transforms noisy plant telemetry into grounded incident response—guarded by human approval and cryptographic auditability."
+                </p>
+              </div>
+
+              {/* End-to-End Architecture Flow */}
+              <div
+                style={{
+                  background: 'var(--bg-surface-elevated)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '8px',
+                  padding: '1.15rem'
+                }}
+              >
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.85rem' }}>
+                  🏗️ END-TO-END SYSTEM ARCHITECTURE
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.75rem'
+                  }}
+                >
+                  <span style={{ background: 'rgba(6,182,212,0.15)', color: 'var(--accent-cyan)', border: '1px solid rgba(6,182,212,0.3)', padding: '4px 8px', borderRadius: '4px' }}>
+                    Sensor Signal
+                  </span>
+                  <span style={{ color: 'var(--text-muted)' }}>→</span>
+                  <span style={{ background: 'rgba(245,158,11,0.15)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.3)', padding: '4px 8px', borderRadius: '4px' }}>
+                    Anomaly Detection
+                  </span>
+                  <span style={{ color: 'var(--text-muted)' }}>→</span>
+                  <span style={{ background: 'rgba(168,85,247,0.15)', color: '#c084fc', border: '1px solid rgba(168,85,247,0.3)', padding: '4px 8px', borderRadius: '4px' }}>
+                    Multi-Agent RCA
+                  </span>
+                  <span style={{ color: 'var(--text-muted)' }}>→</span>
+                  <span style={{ background: 'rgba(59,130,246,0.15)', color: '#60a5fa', border: '1px solid rgba(59,130,246,0.3)', padding: '4px 8px', borderRadius: '4px' }}>
+                    SOP Grounding
+                  </span>
+                  <span style={{ color: 'var(--text-muted)' }}>→</span>
+                  <span style={{ background: 'rgba(239,68,68,0.15)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)', padding: '4px 8px', borderRadius: '4px' }}>
+                    Human Approval
+                  </span>
+                  <span style={{ color: 'var(--text-muted)' }}>→</span>
+                  <span style={{ background: 'rgba(34,197,94,0.15)', color: '#4ade80', border: '1px solid rgba(34,197,94,0.3)', padding: '4px 8px', borderRadius: '4px' }}>
+                    Actuation
+                  </span>
+                  <span style={{ color: 'var(--text-muted)' }}>→</span>
+                  <span style={{ background: 'rgba(16,185,129,0.15)', color: '#10b981', border: '1px solid rgba(16,185,129,0.3)', padding: '4px 8px', borderRadius: '4px' }}>
+                    SHA-256 Ledger
+                  </span>
+                  <span style={{ color: 'var(--text-muted)' }}>→</span>
+                  <span style={{ background: 'rgba(236,72,153,0.15)', color: '#f472b6', border: '1px solid rgba(236,72,153,0.3)', padding: '4px 8px', borderRadius: '4px' }}>
+                    Incident Replay
+                  </span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div style={{ fontSize: '0.8rem', color: 'var(--accent-cyan)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.25rem' }}>
+                {currentStep.subtitle}
+              </div>
+              <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#fff', margin: '0 0 1rem 0' }}>
+                {currentStep.title}
+              </h2>
+
+              <p style={{ color: '#cbd5e1', fontSize: '0.92rem', lineHeight: '1.6', marginBottom: '1.25rem' }}>
+                {currentStep.description}
+              </p>
+
+              <div
+                style={{
+                  background: 'rgba(15, 23, 42, 0.8)',
+                  border: '1px solid var(--border-color)',
+                  borderLeft: '4px solid var(--accent-cyan)',
+                  borderRadius: '6px',
+                  padding: '0.9rem 1.1rem',
+                  marginBottom: '1.5rem',
+                  fontFamily: 'monospace',
+                  fontSize: '0.85rem',
+                  color: 'var(--accent-cyan)'
+                }}
+              >
+                🎯 <strong>Key Demo Focus:</strong> {currentStep.keyMetric}
+              </div>
+
+              {/* Action Trigger Button */}
+              {currentStep.actionText && (
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <button
+                    className="btn btn-primary"
+                    onClick={handleStepAction}
+                    disabled={actionLoading}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 1.25rem',
+                      fontSize: '0.95rem',
+                      fontWeight: 700,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.5rem'
+                    }}
+                  >
+                    {actionLoading ? 'Executing Step Action...' : currentStep.actionText}
+                  </button>
+                </div>
+              )}
+
+              {/* Step Navigation Controls */}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  paddingTop: '1rem',
+                  borderTop: '1px solid var(--border-color)'
+                }}
+              >
+                <button
+                  className="btn btn-outline"
+                  disabled={currentStepIndex === 0}
+                  onClick={() => setCurrentStepIndex((prev) => Math.max(0, prev - 1))}
+                  style={{ opacity: currentStepIndex === 0 ? 0.4 : 1 }}
+                >
+                  ⬅️ Previous Act
+                </button>
+
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  {DEMO_STEPS.map((_, idx) => (
+                    <div
+                      key={idx}
+                      onClick={() => setCurrentStepIndex(idx)}
+                      style={{
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '4px',
+                        background: idx === currentStepIndex ? 'var(--accent-cyan)' : 'rgba(255, 255, 255, 0.1)',
+                        color: idx === currentStepIndex ? '#000' : 'var(--text-muted)',
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        border: idx === currentStepIndex ? '1px solid var(--accent-cyan)' : '1px solid rgba(255,255,255,0.1)'
+                      }}
+                    >
+                      {idx + 1}
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  className="btn btn-primary"
+                  disabled={currentStepIndex === DEMO_STEPS.length - 1}
+                  onClick={() => setCurrentStepIndex((prev) => Math.min(DEMO_STEPS.length - 1, prev + 1))}
+                  style={{ opacity: currentStepIndex === DEMO_STEPS.length - 1 ? 0.4 : 1 }}
+                >
+                  Next Act ➡️
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

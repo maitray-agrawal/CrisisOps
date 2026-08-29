@@ -16,6 +16,9 @@ Industrial CrisisOps is an AI-powered industrial incident investigation and resp
 | **Phase 4** | Controlled Agent Pipeline, SOP RAG & Human Approval Gate | 4 Sequential Agents (Signal, RCA, Impact, SOP), SOP RAG Retriever, Human Approval Gate, Simulated Actuation | **COMPLETED** |
 | **Phase 5** | Auditability, Decision Ledger, Explainability & Incident Replay | SHA-256 Cryptographic Audit Ledger, Explainability RAG Maps, Time-Travel Incident Replay Engine | **COMPLETED** |
 | **Phase 6** | Demo Hardening + Mission Control Experience | 7-Act Judge Demo Flow, Global State Sync, Operator UX Polish, Demo Guide | **COMPLETED** |
+| **Phase 7** | Competitive Audit | Comprehensive Read-Only Security, Architecture, & Pitch Audit | **COMPLETED** |
+| **Phase 8A** | Live AI Execution Visualizer + Risk Telemetry | 4-Stage Agent Pipeline Stepper, Grounding Badges, Telemetry Z-Score Card, Financial Risk Card | **COMPLETED** |
+| **Phase 8B** | Presentation Controls + SHA-256 Ledger Inspector | Keyboard 1-7 Shortcuts, Web Crypto API Hash Inspector, Interactive Hash Links, Dynamic Ledger Status Badge | **COMPLETED** |
 
 ---
 

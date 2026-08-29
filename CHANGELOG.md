@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.6.0] - 2026-08-29
+### Added
+- **AI Agent Stepper Pipeline (`AgentStepper.tsx`)**: Created visual 4-stage pipeline stepper displaying agent lifecycle states (`IDLE`, `RUNNING`, `COMPLETE`, `FALLBACK`) with source grounding indicators.
+- **Explainable Risk Telemetry**: Added transparent telemetry anomaly Z-Score cards and financial downtime risk estimation breakdowns in `IncidentsPage.tsx`.
+- **Web Crypto SHA-256 Hash Inspector (`HashVerifierModal.tsx`)**: Built live browser-native Web Crypto API (`crypto.subtle.digest`) SHA-256 hash recalculation and payload editing interface to demonstrate tamper detection in real-time.
+- **Keyboard Presentation Controls (`DemoGuideModal.tsx`)**: Added global keyboard shortcuts (`1`–`7` for Acts 1–7, Arrow keys for navigation, Esc to close) with input focus guardrails.
+- **Interactive Audit Ledger (`AuditLedgerViewer.tsx`)**: Made all ledger block hashes clickable to launch the inspector modal, and added a dynamic ledger integrity status badge.
+- **Verification Suite**: 30/30 backend unit tests passing (`pytest`); `npm run build` Vite production build passing with 0 errors.
+
 ## [v0.5.0] - 2026-08-29
 ### Added
 - **Interactive Judge Demo Walkthrough Guide**: Created `DemoGuideModal.tsx` providing a 7-Act interactive walkthrough wizard for live hackathon presentations.
