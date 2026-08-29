@@ -104,3 +104,58 @@ def test_human_approval_and_actuation_flow(db_session):
     db_session.delete(inc)
     db_session.delete(m)
     db_session.commit()
+
+
+def test_actuation_authorization_safety_invariants(db_session):
+    from app.models.models import ActionRecommendation, AuditLog
+
+    m = Machine(id="M-SAFE-TEST", name="Safety Machine", type="Test Type", location="Unit 2", status="CRITICAL")
+    db_session.add(m)
+    inc = Incident(id="INC-SAFE-001", machine_id="M-SAFE-TEST", title="Safety Test Incident", severity="CRITICAL", status="OPEN")
+    db_session.add(inc)
+    db_session.commit()
+
+    # Case A: Actuation with NO recommendations -> Must be rejected
+    with pytest.raises(PermissionError, match="Human approval required"):
+        actuation_engine.execute_simulated_actuation(db_session, "INC-SAFE-001")
+
+    # Case B: Actuation with recommendation but NO human approval -> Must be rejected
+    rec = ActionRecommendation(
+        id="ACT-SAFE-01",
+        incident_id="INC-SAFE-001",
+        sop_id="SOP-M204-BEARING",
+        action_title="Safety Action Test",
+        description="Emergency response safety action description",
+        priority="HIGH",
+        human_approved=False
+    )
+    db_session.add(rec)
+    db_session.commit()
+
+    with pytest.raises(PermissionError, match="Human approval required"):
+        actuation_engine.execute_simulated_actuation(db_session, "INC-SAFE-001")
+
+    # Case C: Actuation with explicitly approved recommendation -> Must succeed
+    appr_res = actuation_engine.approve_action_plan(db_session, "INC-SAFE-001", "Safety Officer Bob")
+    assert appr_res["human_approved"] is True
+
+    act_res = actuation_engine.execute_simulated_actuation(db_session, "INC-SAFE-001")
+    assert act_res["machine_status"] == "CONTAINED"
+    assert act_res["incident_status"] == "CONTAINED"
+
+    # Case D: Idempotency -> Re-execution of contained actuation remains successful and stable
+    act_res_repeat = actuation_engine.execute_simulated_actuation(db_session, "INC-SAFE-001")
+    assert act_res_repeat["machine_status"] == "CONTAINED"
+
+    # Case E: Verify audit events recorded for approval and actuation
+    logs = db_session.query(AuditLog).filter(AuditLog.incident_id == "INC-SAFE-001").all()
+    action_types = [l.action_type for l in logs]
+    assert "OPERATOR_APPROVED" in action_types
+    assert "ACTUATION_EXECUTED" in action_types
+
+    # Cleanup
+    db_session.delete(rec)
+    db_session.delete(inc)
+    db_session.delete(m)
+    db_session.commit()
+

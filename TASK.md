@@ -104,18 +104,25 @@
   - [x] Validate `pytest` pass rate (30/30 passed)
   - [x] Validate `npm run build` with zero errors
 
-## Phase 6: Demo Hardening + Mission Control Experience (COMPLETED)
-- [x] 6A: Demo Reliability & Fallback Verification
-  - [x] Ensure `reset_simulation()` cleanly clears all active/stale state
-  - [x] Verify deterministic fallback execution during 7-Act presentation
-- [x] 6B: Global State Synchronization & Polling
-  - [x] Ensure instant event-driven UI updates across all active pages on simulation events
-- [x] 6C: Operator Experience & UI Polish
-  - [x] Polish status badges, KPI cards, and critical spotlight banner
-- [x] 6D: Interactive Judge Demo Guide
-  - [x] Create `DemoGuideModal.tsx` walkthrough wizard for the 7-Act Crisis Scenario
-- [x] 6E: End-to-End Test & Verification
-  - [x] Verify 30/30 pytest tests
-  - [x] Verify `npm run build` with zero errors
+## Phase 8A: Live AI Execution Visualizer + Risk Telemetry (COMPLETED)
+- [x] Create 4-stage AI Agent Stepper (`AgentStepper.tsx`)
+- [x] Add Explainable Risk Telemetry & Z-Score cards (`IncidentsPage.tsx`)
+
+## Phase 8B: Presentation Controls + SHA-256 Ledger Inspector (COMPLETED)
+- [x] Implement keyboard shortcuts (`1`–`7`, Arrows, Esc) in `DemoGuideModal.tsx`
+- [x] Create Web Crypto SHA-256 Hash Inspector (`HashVerifierModal.tsx`)
+- [x] Make audit ledger block hashes interactive in `AuditLedgerViewer.tsx`
+
+## Phase 9: Final Release Hardening & Verification (COMPLETED)
+- [x] 9A: Actuation Engine Human Approval Invariant (`actuation_engine.py`)
+  - [x] Enforce NO_RECOMMENDATION -> DENY, UNAPPROVED_RECOMMENDATION -> DENY, APPROVED_RECOMMENDATION -> ALLOW
+- [x] 9B: Safety Invariant Test Suite (`test_agent_pipeline.py`)
+  - [x] Write regression tests covering all authorization states
+- [x] 9C: Repository Release Hygiene
+  - [x] Remove and untrack all Python bytecode (`.pyc` and `__pycache__`) from Git index
+- [x] 9D: Final Verification & Contract Check
+  - [x] Verify backend tests (31/31 passed)
+  - [x] Verify frontend build (`npm run build` 0 errors)
+  - [x] Verify 7-Act Demo contract and Web Crypto inspector
 
 

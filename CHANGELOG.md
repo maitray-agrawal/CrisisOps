@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.7.0] - 2026-08-29
+### Added
+- **Actuation Safety Invariants**: Implemented strict human-in-the-loop authorization invariant in `actuation_engine.py` requiring explicit `ActionRecommendation` and `human_approved=True` before machine containment actuation can be executed.
+- **Safety Invariant Regression Suite**: Added unit tests in `test_agent_pipeline.py` covering NO_RECOMMENDATION -> DENY, UNAPPROVED_RECOMMENDATION -> DENY, APPROVED_RECOMMENDATION -> ALLOW.
+- **Repository Hygiene**: Purged and untracked all Python bytecode (`__pycache__` and `*.pyc` files) from Git index.
+- **Verification Suite**: 31/31 backend unit tests passing (`pytest`); Vite production build (`npm run build`) passing cleanly with 0 errors.
+
 ## [v0.6.0] - 2026-08-29
 ### Added
 - **AI Agent Stepper Pipeline (`AgentStepper.tsx`)**: Created visual 4-stage pipeline stepper displaying agent lifecycle states (`IDLE`, `RUNNING`, `COMPLETE`, `FALLBACK`) with source grounding indicators.

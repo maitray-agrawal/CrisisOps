@@ -118,4 +118,18 @@ Embed an interactive 7-Act presentation guide (`DemoGuideModal.tsx`) directly in
 - Eliminates risk of stale incident references or 404 errors during reset operations.
 - Highlights SHA-256 ledger integrity and real-time state transitions prominently.
 
+---
+
+## ADR-009: Strict Actuation Safety Invariant Enforcement
+
+### Context
+In automated containment actuation, missing or unapproved recommendations could theoretically bypass safety validation if non-strict boolean checks are used.
+
+### Decision
+Enforce a non-bypassable safety invariant in `actuation_engine.py`: containment actuation requires the explicit existence of at least one `ActionRecommendation` tied to the incident, AND at least one recommendation must have `human_approved=True`. `NO_RECOMMENDATION -> DENY`, `UNAPPROVED_RECOMMENDATION -> DENY`, `APPROVED_RECOMMENDATION -> ALLOW`.
+
+### Rationale
+- Completely eliminates authorization loopholes where empty or pending recommendations could trigger machine actuation.
+- Enforces strict zero-trust safety boundary backed by automated regression tests in `test_agent_pipeline.py`.
+
 

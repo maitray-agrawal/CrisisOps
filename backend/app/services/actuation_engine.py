@@ -82,9 +82,10 @@ class ActuationEngine:
         if not incident:
             raise ValueError(f"Incident #{incident_id} not found.")
 
-        # Ensure human approval gate has been passed
+        # Ensure human approval gate has been passed:
+        # Invariant: NO_RECOMMENDATION -> DENY, UNAPPROVED_RECOMMENDATION -> DENY, APPROVED_RECOMMENDATION -> ALLOW
         recommendations = db.query(ActionRecommendation).filter(ActionRecommendation.incident_id == incident_id).all()
-        is_approved = any(r.human_approved for r in recommendations) if recommendations else True
+        is_approved = bool(recommendations) and any(r.human_approved for r in recommendations)
 
         if not is_approved:
             raise PermissionError("Human approval required before executing containment actuation.")
