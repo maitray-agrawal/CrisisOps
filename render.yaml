@@ -1,7 +1,7 @@
 services:
   # 1. FastAPI Backend Web Service
   - type: web
-    name: crisisops-backend
+    name: crisisops-api
     runtime: python
     region: oregon
     plan: free
