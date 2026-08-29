@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.2.0] - 2026-08-29
+### Added
+- **Telemetry Simulation Engine**: `TelemetrySimulator` (`backend/app/services/telemetry.py`) for live bounded sensor stream generation and deterministic M-204 Centrifugal Compressor bearing degradation flow.
+- **Explainable Anomaly Detector**: `AnomalyDetector` (`backend/app/services/detector.py`) evaluating Vibration (>2.5 mm/s, >4.5 mm/s), Temperature (>75°C), and Output rate drop (>30%) with structured explanation fields.
+- **Machine State Transition Engine**: `MachineStateEngine` (`backend/app/services/state_engine.py`) managing derived asset states (`NORMAL`, `WARNING`, `ANOMALOUS`, `CRITICAL`, `CONTAINED`).
+- **Automated Incident & Evidence Engine**: `IncidentEngine` (`backend/app/services/incident_engine.py`) automatically creating incident tickets, attaching telemetry & maintenance evidence (`MNT-882`), and linking matching SOP action recommendations.
+- **Simulation Control APIs**: REST endpoints `/api/simulation/tick`, `/api/simulation/reset`, `/api/simulation/trigger-degradation`, and `/api/simulation/anomalies/{id}`.
+- **Frontend Live Polling & Demo Controls**: Added 3-second background polling and interactive header control widgets ("Trigger M-204 Failure", "Step Tick", "Reset Demo") across `DashboardPage`, `IncidentsPage`, and `MachinesPage`.
+- **Phase 3 Test Suite**: Added 10 deterministic test cases in `backend/tests/test_anomaly_engine.py` (21/21 passing tests).
+
 ## [v0.1.0] - 2026-08-29
 ### Added
 - **Backend Scaffolding**: Modular FastAPI monolith with `core`, `models`, `schemas`, `api`, and `db` packages.

@@ -90,5 +90,26 @@ export const apiService = {
   async getSOPDetail(id: string): Promise<SOPDocument> {
     const res = await fetch(`${API_BASE}/sops/${encodeURIComponent(id)}`);
     return handleResponse<SOPDocument>(res);
+  },
+
+  // Simulation Controls
+  async getSimulationStatus(): Promise<{ mode: string; step_count: number }> {
+    const res = await fetch(`${API_BASE}/simulation/status`);
+    return handleResponse(res);
+  },
+
+  async stepSimulation(): Promise<any> {
+    const res = await fetch(`${API_BASE}/simulation/tick`, { method: 'POST' });
+    return handleResponse(res);
+  },
+
+  async triggerM204Degradation(): Promise<any> {
+    const res = await fetch(`${API_BASE}/simulation/trigger-degradation`, { method: 'POST' });
+    return handleResponse(res);
+  },
+
+  async resetSimulation(): Promise<any> {
+    const res = await fetch(`${API_BASE}/simulation/reset`, { method: 'POST' });
+    return handleResponse(res);
   }
 };

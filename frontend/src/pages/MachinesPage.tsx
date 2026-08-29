@@ -14,13 +14,13 @@ export const MachinesPage: React.FC<MachinesPageProps> = ({ selectedMachineId })
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchMachines = async () => {
-    setLoading(true);
+  const fetchMachines = async (showLoading = false) => {
+    if (showLoading) setLoading(true);
     setError(null);
     try {
       const data = await apiService.getMachines();
       setMachines(data);
-      const targetId = selectedMachineId || (data.length > 0 ? data[0].id : null);
+      const targetId = activeMachine?.id || selectedMachineId || (data.length > 0 ? data[0].id : null);
       if (targetId) {
         const detail = await apiService.getMachineDetail(targetId);
         setActiveMachine(detail);
@@ -28,12 +28,24 @@ export const MachinesPage: React.FC<MachinesPageProps> = ({ selectedMachineId })
     } catch (err: any) {
       setError(err.message || 'Failed to fetch machines telemetry.');
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchMachines();
+    fetchMachines(true);
+
+    const interval = setInterval(() => {
+      fetchMachines(false);
+    }, 3000);
+
+    const handleSimUpdate = () => fetchMachines(false);
+    window.addEventListener('simulation-updated', handleSimUpdate);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('simulation-updated', handleSimUpdate);
+    };
   }, [selectedMachineId]);
 
   const selectMachine = async (id: string) => {
@@ -49,7 +61,7 @@ export const MachinesPage: React.FC<MachinesPageProps> = ({ selectedMachineId })
   };
 
   if (loading && !activeMachine) return <LoadingSpinner message="Polling sensor registers & stream history..." />;
-  if (error) return <ErrorAlert message={error} onRetry={fetchMachines} />;
+  if (error) return <ErrorAlert message={error} onRetry={() => fetchMachines(true)} />;
 
   return (
     <div className="page-container">
@@ -60,7 +72,7 @@ export const MachinesPage: React.FC<MachinesPageProps> = ({ selectedMachineId })
           <p className="page-subtitle">High-Frequency Telemetry Stream, Statistical Z-Scores & Maintenance Record Timeline</p>
         </div>
         <div>
-          <button className="btn btn-outline" onClick={fetchMachines} style={{ fontSize: '0.8rem' }}>
+          <button className="btn btn-outline" onClick={() => fetchMachines(true)} style={{ fontSize: '0.8rem' }}>
             🔄 Refresh Sensor Data
           </button>
         </div>

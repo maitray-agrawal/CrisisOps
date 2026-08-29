@@ -1,24 +1,21 @@
 # Current Project State — Industrial CrisisOps
 
 ## Current Status
-- **Current Phase**: Phase 1 — Foundation (COMPLETED)
-- **Active Task**: Transitioning to Phase 2 — Anomaly Detection Engine
+- **Current Phase**: Phase 3 — Industrial Telemetry & Anomaly Engine (COMPLETED)
+- **Active Task**: Transitioning to Phase 4 — AI Root Cause & SOP Intelligence Engine
 - **Last Updated**: 2026-08-29
 
-## Work Completed in Phase 1
-- [x] Initialized FastAPI backend structure under `backend/app/` with modular core, models, schemas, and API routers.
-- [x] Created SQLite database schema via SQLAlchemy models (`Machine`, `TelemetryRecord`, `MaintenanceRecord`, `Incident`, `Evidence`, `SOPDocument`, `ActionRecommendation`).
-- [x] Defined Pydantic V2 schemas with strict typing and validation.
-- [x] Implemented API endpoints for `/api/health`, `/api/machines`, `/api/incidents`, `/api/sops`.
-- [x] Configured CORS middleware for local frontend integration.
-- [x] Developed deterministic database seed script (`backend/app/db/seed.py`) with M-204 telemetry anomaly and bearing replacement records.
-- [x] Built comprehensive Pytest test suite (`backend/tests`) with 11 passing tests.
-- [x] Scaffolded React + TypeScript + Vite frontend (`frontend/`) with modern high-contrast industrial control dashboard layout.
-- [x] Built frontend API service layer (`frontend/src/services/api.ts`) and custom page views (`DashboardPage`, `IncidentsPage`, `MachinesPage`).
-- [x] Verified zero-error TypeScript build (`npm run lint` & `npm run build`).
+## Work Completed in Phase 3
+- [x] **Phase 3A: Telemetry Simulation Engine**: Implemented `TelemetrySimulator` (`backend/app/services/telemetry.py`) supporting bounded baseline stream generation and deterministic M-204 Centrifugal Compressor bearing degradation flow.
+- [x] **Phase 3B: Anomaly Detection Engine**: Implemented `AnomalyDetector` (`backend/app/services/detector.py`) with transparent, explainable threshold rules for Vibration (>2.5 mm/s warning, >4.5 mm/s critical), Temperature (>75°C), and Output degradation (>30% drop).
+- [x] **Phase 3C: Machine State Engine**: Implemented `MachineStateEngine` (`backend/app/services/state_engine.py`) establishing backend as source-of-truth for machine state transitions (`NORMAL` -> `WARNING` -> `ANOMALOUS` -> `CRITICAL`).
+- [x] **Phase 3D: Incident Engine**: Implemented `IncidentEngine` (`backend/app/services/incident_engine.py`) for automatic incident creation, duplicate prevention, and telemetry/maintenance evidence correlation.
+- [x] **Phase 3E: Simulation APIs**: Exposed `/api/simulation/tick`, `/api/simulation/reset`, `/api/simulation/trigger-degradation`, and `/api/simulation/anomalies/{id}` endpoints.
+- [x] **Phase 3F: Frontend Live Polling & Controls**: Added 3-second live polling across Dashboard, Incidents, and Telemetry Inspector views, plus interactive header demo controls (Trigger Failure, Step Tick, Reset).
+- [x] **Phase 3G: Testing Suite**: Created Pytest suite `backend/tests/test_anomaly_engine.py` (21/21 passing tests across entire backend).
+- [x] **Phase 3H: Build Validation**: Verified `npm run build` with zero TypeScript errors and zero compilation warnings.
 
-## Next Immediate Steps (Phase 2)
-1. Implement Rule-Based & Statistical Anomaly Detector service in `backend/app/services/detector.py`.
-2. Configure threshold alerting rules (Vibration > 2.5 mm/s, Temp > 75°C, Output drop > 30%).
-3. Expose real-time anomaly analysis API endpoints.
-4. Add telemetry streaming visualization on the React frontend.
+## Next Immediate Steps (Phase 4)
+1. Implement LLM/LangChain multi-agent workflow for root cause analysis and action synthesis.
+2. Build SOP document embedding & vector search retriever.
+3. Integrate automated action recommendations into human-in-the-loop approval workflow.

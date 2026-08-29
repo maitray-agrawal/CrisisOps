@@ -19,8 +19,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadDashboardData = async () => {
-    setLoading(true);
+  const loadDashboardData = async (showLoading = false) => {
+    if (showLoading) setLoading(true);
     setError(null);
     try {
       const [machinesData, incidentsData, telemetryData] = await Promise.all([
@@ -34,16 +34,29 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     } catch (err: any) {
       setError(err.message || 'Failed to load dashboard data.');
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadDashboardData();
+    loadDashboardData(true);
+
+    // 3-second live polling interval
+    const interval = setInterval(() => {
+      loadDashboardData(false);
+    }, 3000);
+
+    const handleSimUpdate = () => loadDashboardData(false);
+    window.addEventListener('simulation-updated', handleSimUpdate);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('simulation-updated', handleSimUpdate);
+    };
   }, []);
 
   if (loading) return <LoadingSpinner message="Connecting to industrial telemetry pipeline & AI agent stream..." />;
-  if (error) return <ErrorAlert message={error} onRetry={loadDashboardData} />;
+  if (error) return <ErrorAlert message={error} onRetry={() => loadDashboardData(true)} />;
 
   const criticalIncidents = incidents.filter(i => i.severity === 'CRITICAL' || i.severity === 'HIGH');
   const criticalMachineCount = machines.filter(m => m.status === 'CRITICAL' || m.status === 'WARNING').length;
@@ -60,7 +73,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         </div>
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
           <span className="mono" style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Last synced: Just now</span>
-          <button className="btn btn-outline" onClick={loadDashboardData} style={{ fontSize: '0.8rem' }}>
+          <button className="btn btn-outline" onClick={() => loadDashboardData(true)} style={{ fontSize: '0.8rem' }}>
             🔄 Refresh Pipeline
           </button>
         </div>

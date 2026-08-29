@@ -1,4 +1,5 @@
 import React from 'react';
+import { apiService } from '../services/api';
 
 export type NavigationTab = 'dashboard' | 'incidents' | 'machines' | 'sops' | 'analytics' | 'alerts' | 'settings';
 
@@ -104,6 +105,44 @@ export const Layout: React.FC<LayoutProps> = ({
           </div>
 
           <div className="top-header-actions">
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginRight: '8px' }}>
+              <button
+                className="btn btn-danger"
+                style={{ fontSize: '0.75rem', padding: '4px 10px', height: '32px' }}
+                onClick={async () => {
+                  await apiService.triggerM204Degradation();
+                  window.dispatchEvent(new Event('simulation-updated'));
+                }}
+                title="Trigger M-204 bearing degradation simulation scenario"
+              >
+                🔥 Trigger M-204 Failure
+              </button>
+
+              <button
+                className="btn btn-secondary"
+                style={{ fontSize: '0.75rem', padding: '4px 10px', height: '32px' }}
+                onClick={async () => {
+                  await apiService.stepSimulation();
+                  window.dispatchEvent(new Event('simulation-updated'));
+                }}
+                title="Advance telemetry simulation stream by 1 step"
+              >
+                ⏩ Step Tick
+              </button>
+
+              <button
+                className="btn btn-outline"
+                style={{ fontSize: '0.75rem', padding: '4px 10px', height: '32px', borderColor: 'var(--border-color)', color: 'var(--text-muted)' }}
+                onClick={async () => {
+                  await apiService.resetSimulation();
+                  window.dispatchEvent(new Event('simulation-updated'));
+                }}
+                title="Reset simulation and clear active incidents"
+              >
+                🔄 Reset Demo
+              </button>
+            </div>
+
             <div className="system-online-badge">
               <span className="pulsate-dot"></span>
               <span>SYSTEM ONLINE</span>

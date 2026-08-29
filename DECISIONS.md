@@ -74,3 +74,17 @@ Integrate a statistical Z-Score/EWMA telemetry baseline anomaly detector and equ
 
 ### Rationale
 - Guarantees that even if LLM APIs fail completely, the platform instantly triggers anomalies, identifies Machine M-204 bearing degradation, displays estimated business impact, retrieves SOPs, and allows simulated containment.
+
+---
+
+## ADR-006: Backend-as-Source-of-Truth Telemetry Engine & Live Polling
+
+### Context
+Phase 3 requires transforming static baseline data into a dynamic operational pipeline capable of driving real-time frontend updates during live failure scenarios.
+
+### Decision
+Implement `TelemetrySimulator`, `AnomalyDetector`, `MachineStateEngine`, and `IncidentEngine` in `backend/app/services/`, controlled via FastAPI simulation endpoints (`/api/simulation/tick`, `/api/simulation/reset`, `/api/simulation/trigger-degradation`). The React frontend polls the REST endpoints at a controlled 3-second interval with event-based instant updates.
+
+### Rationale
+- Guarantees backend state consistency across all browser windows and API clients.
+- Prevents UI state drift and provides deterministic control for hackathon evaluation and demonstration.

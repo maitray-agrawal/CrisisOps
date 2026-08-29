@@ -16,8 +16,8 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({ selectedIncidentId
   const [error, setError] = useState<string | null>(null);
   const [approvedActionIds, setApprovedActionIds] = useState<Record<string, boolean>>({});
 
-  const fetchIncidentsData = async () => {
-    setLoading(true);
+  const fetchIncidentsData = async (showLoading = false) => {
+    if (showLoading) setLoading(true);
     setError(null);
     try {
       const data = await apiService.getIncidents();
@@ -43,12 +43,24 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({ selectedIncidentId
     } catch (err: any) {
       setError(err.message || 'Failed to fetch incident details.');
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchIncidentsData();
+    fetchIncidentsData(true);
+
+    const interval = setInterval(() => {
+      fetchIncidentsData(false);
+    }, 3000);
+
+    const handleSimUpdate = () => fetchIncidentsData(false);
+    window.addEventListener('simulation-updated', handleSimUpdate);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('simulation-updated', handleSimUpdate);
+    };
   }, [selectedIncidentId]);
 
   const selectIncident = async (id: string) => {
@@ -80,7 +92,7 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({ selectedIncidentId
   };
 
   if (loading && !activeIncident) return <LoadingSpinner message="Correlating telemetry signals & AI agent reasoning chain..." />;
-  if (error) return <ErrorAlert message={error} onRetry={fetchIncidentsData} />;
+  if (error) return <ErrorAlert message={error} onRetry={() => fetchIncidentsData(true)} />;
 
   return (
     <div className="page-container">
@@ -91,7 +103,7 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({ selectedIncidentId
           <p className="page-subtitle">Multi-Agent AI Telemetry Correlation, Root Cause Hypothesis & Action Plan Verification</p>
         </div>
         <div>
-          <button className="btn btn-outline" onClick={fetchIncidentsData} style={{ fontSize: '0.8rem' }}>
+          <button className="btn btn-outline" onClick={() => fetchIncidentsData(true)} style={{ fontSize: '0.8rem' }}>
             🔄 Refresh Agent Stream
           </button>
         </div>
