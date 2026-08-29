@@ -9,6 +9,7 @@ from app.agents.rca_agent import RootCauseAnalysisAgent
 from app.agents.impact_agent import ImpactAssessmentAgent
 from app.agents.sop_agent import SOPResponseAgent
 from app.services.sop_rag_service import sop_rag_service
+from app.services.audit_service import AuditService
 
 logger = logging.getLogger("crisisops.orchestrator")
 
@@ -70,6 +71,14 @@ class MultiAgentOrchestrator:
             machine_id=machine.id,
             telemetry_records=telemetry_records
         )
+        AuditService.record_event(
+            db=db,
+            incident_id=incident_id,
+            actor_type="AGENT_SIGNAL",
+            actor_id="SignalCorrelatorAgent",
+            action_type="SIGNAL_CORRELATED",
+            details=signal_output.model_dump()
+        )
 
         # Stage 2: Root Cause Analysis (RCA) Agent
         rca_output = self.rca_agent.analyze_root_cause(
@@ -77,11 +86,27 @@ class MultiAgentOrchestrator:
             signal_analysis=signal_output,
             maintenance_records=maintenance_records
         )
+        AuditService.record_event(
+            db=db,
+            incident_id=incident_id,
+            actor_type="AGENT_RCA",
+            actor_id="RootCauseAnalysisAgent",
+            action_type="RCA_GENERATED",
+            details=rca_output.model_dump()
+        )
 
         # Stage 3: Impact Assessment Agent
         impact_output = self.impact_agent.assess_impact(
             machine_id=machine.id,
             rca_payload=rca_output
+        )
+        AuditService.record_event(
+            db=db,
+            incident_id=incident_id,
+            actor_type="AGENT_IMPACT",
+            actor_id="ImpactAssessmentAgent",
+            action_type="IMPACT_ASSESSED",
+            details=impact_output.model_dump()
         )
 
         # Stage 4: SOP RAG Retrieval & Response Agent
@@ -97,6 +122,14 @@ class MultiAgentOrchestrator:
             rca_payload=rca_output,
             impact_output=impact_output,
             matching_sop=matching_sop
+        )
+        AuditService.record_event(
+            db=db,
+            incident_id=incident_id,
+            actor_type="AGENT_SOP",
+            actor_id="SOPResponseAgent",
+            action_type="SOP_MATCHED",
+            details=sop_output.model_dump()
         )
 
         # Update Incident in Database

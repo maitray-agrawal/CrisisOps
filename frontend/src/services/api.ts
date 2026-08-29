@@ -8,7 +8,11 @@ import {
   Incident,
   Evidence,
   ActionRecommendation,
-  SOPDocument
+  SOPDocument,
+  AuditLogEntry,
+  AuditVerificationResponse,
+  ExplainabilityReport,
+  ReplayTimeline
 } from '../types';
 
 const API_BASE = (import.meta as any).env?.VITE_API_URL || '/api';
@@ -140,5 +144,27 @@ export const apiService = {
       method: 'POST'
     });
     return handleResponse(res);
+  },
+
+  // Audit, Explainability & Replay
+  async getAuditTrail(incidentId: string): Promise<AuditLogEntry[]> {
+    const res = await fetch(`${API_BASE}/incidents/${encodeURIComponent(incidentId)}/audit-trail`);
+    return handleResponse<AuditLogEntry[]>(res);
+  },
+
+  async verifyAuditTrail(incidentId: string): Promise<AuditVerificationResponse> {
+    const res = await fetch(`${API_BASE}/incidents/${encodeURIComponent(incidentId)}/audit-trail/verify`);
+    return handleResponse<AuditVerificationResponse>(res);
+  },
+
+  async getExplainabilityReport(incidentId: string): Promise<ExplainabilityReport> {
+    const res = await fetch(`${API_BASE}/incidents/${encodeURIComponent(incidentId)}/explainability`);
+    return handleResponse<ExplainabilityReport>(res);
+  },
+
+  async getReplayTimeline(incidentId: string): Promise<ReplayTimeline> {
+    const res = await fetch(`${API_BASE}/incidents/${encodeURIComponent(incidentId)}/replay`);
+    return handleResponse<ReplayTimeline>(res);
   }
 };
+

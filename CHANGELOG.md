@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.4.0] - 2026-08-29
+### Added
+- **Cryptographic Decision Ledger**: Implemented `AuditLog` database model with SHA-256 hash chaining (`previous_hash` -> `current_hash`) and integrity verification in `audit_service.py`.
+- **AI Explainability & RAG Citation Engine**: Implemented `get_explainability_report()` surfacing feature attributions, confidence scores, and SOP markdown citations.
+- **Time-Travel Incident Replay**: Built `replay_service.py` assembling synchronized temporal telemetry streams and audit event sequences.
+- **Audit & Replay API Surface**: Exposed `/api/incidents/{id}/audit-trail`, `/api/incidents/{id}/audit-trail/verify`, `/api/incidents/{id}/explainability`, and `/api/incidents/{id}/replay`.
+- **Frontend Command Center UI**: Created `AuditLedgerViewer.tsx`, `ExplainabilityMap.tsx`, and `ReplayPlayer.tsx` integrated via sub-navigation tabs in `IncidentsPage.tsx`.
+- **Verification Suite**: Added `backend/tests/test_audit_replay.py`; 30/30 pytest tests passing; Vite production build (`npm run build`) passing with 0 errors.
+
 ## [v0.3.0] - 2026-08-29
 ### Added
 - **4-Stage AI Pipeline**: Implemented `SignalCorrelatorAgent`, `RootCauseAnalysisAgent`, `ImpactAssessmentAgent`, and `SOPResponseAgent` with deterministic fallback mechanisms for hackathon reliability.

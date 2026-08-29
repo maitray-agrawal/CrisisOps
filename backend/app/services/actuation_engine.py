@@ -3,6 +3,7 @@ from typing import Dict, Any
 from sqlalchemy.orm import Session
 from app.models.models import Incident, Machine, ActionRecommendation
 from app.services.telemetry import TelemetrySimulator
+from app.services.audit_service import AuditService
 
 
 class ActuationEngine:
@@ -48,6 +49,19 @@ class ActuationEngine:
         incident.status = "APPROVED"
         db.commit()
 
+        AuditService.record_event(
+            db=db,
+            incident_id=incident_id,
+            actor_type="HUMAN_OPERATOR",
+            actor_id=operator_name,
+            action_type="OPERATOR_APPROVED",
+            details={
+                "approved_by": operator_name,
+                "status": "APPROVED",
+                "approved_at": datetime.now(timezone.utc).isoformat()
+            }
+        )
+
         return {
             "incident_id": incident_id,
             "status": "APPROVED",
@@ -92,6 +106,20 @@ class ActuationEngine:
             rec.executed_at = datetime.now(timezone.utc)
 
         db.commit()
+
+        AuditService.record_event(
+            db=db,
+            incident_id=incident_id,
+            actor_type="ACTUATION_ENGINE",
+            actor_id="SimulatedActuationController",
+            action_type="ACTUATION_EXECUTED",
+            details={
+                "incident_id": incident_id,
+                "machine_id": incident.machine_id,
+                "machine_status": "CONTAINED",
+                "telemetry_stabilized": True
+            }
+        )
 
         return {
             "incident_id": incident_id,

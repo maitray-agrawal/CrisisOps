@@ -144,3 +144,61 @@ export interface InvestigationResult {
   pipeline_status: string;
   executed_at: string;
 }
+
+export interface AuditLogEntry {
+  id: string;
+  incident_id: string;
+  timestamp: string;
+  actor_type: string;
+  actor_id: string;
+  action_type: string;
+  details_json: string;
+  previous_hash: string;
+  current_hash: string;
+}
+
+export interface AuditVerificationResponse {
+  is_valid: boolean;
+  total_entries: number;
+  tampered_entry_id?: string;
+  message: string;
+}
+
+export interface ExplainabilityReport {
+  incident_id: string;
+  machine_id: string;
+  hypothesis: string;
+  confidence_score: number;
+  telemetry_features: Array<{ title: string; description: string; confidence: number }>;
+  correlated_maintenance: Array<{ title: string; description: string; confidence: number }>;
+  cited_sop?: {
+    id: string;
+    code: string;
+    title: string;
+    target_component: string;
+    snippet: string;
+  };
+  fallback_used: boolean;
+  reasoning_summary: string;
+}
+
+export interface ReplayStep {
+  step_number: number;
+  timestamp: string;
+  vibration_mm_s: number;
+  temp_celsius: number;
+  output_units_min: number;
+  machine_status: string;
+  event_title?: string;
+  event_type?: string;
+  event_actor?: string;
+  details?: Record<string, any>;
+}
+
+export interface ReplayTimeline {
+  incident_id: string;
+  machine_id: string;
+  total_steps: number;
+  steps: ReplayStep[];
+}
+

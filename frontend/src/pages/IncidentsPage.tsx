@@ -3,6 +3,9 @@ import { apiService } from '../services/api';
 import { Incident, SOPDocument } from '../types';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorAlert } from '../components/ErrorAlert';
+import { AuditLedgerViewer } from '../components/AuditLedgerViewer';
+import { ExplainabilityMap } from '../components/ExplainabilityMap';
+import { ReplayPlayer } from '../components/ReplayPlayer';
 
 interface IncidentsPageProps {
   selectedIncidentId?: string | null;
@@ -15,6 +18,7 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({ selectedIncidentId
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [approvedActionIds, setApprovedActionIds] = useState<Record<string, boolean>>({});
+  const [activeTab, setActiveTab] = useState<'workspace' | 'audit' | 'explainability' | 'replay'>('workspace');
 
   const fetchIncidentsData = async (showLoading = false) => {
     if (showLoading) setLoading(true);
@@ -188,31 +192,69 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({ selectedIncidentId
         {/* Right Side: Incident Deep-Dive Workspace */}
         {activeIncident ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            {/* Pipeline Stage Status Bar */}
-            <div className="card" style={{ padding: '0.9rem 1.25rem' }}>
-              <div className="pipeline-header">
-                <div className="pipeline-stage active">
-                  <div className="stage-step">1</div>
-                  <span>Signal Detection</span>
-                </div>
-                <div className="pipeline-stage active">
-                  <div className="stage-step">2</div>
-                  <span>Root Cause AI</span>
-                </div>
-                <div className="pipeline-stage active">
-                  <div className="stage-step">3</div>
-                  <span>Impact Analysis</span>
-                </div>
-                <div className="pipeline-stage active">
-                  <div className="stage-step">4</div>
-                  <span>SOP RAG Retrieval</span>
-                </div>
-                <div className={`pipeline-stage ${activeIncident.status === 'CONTAINED' ? 'active' : 'pending'}`}>
-                  <div className="stage-step">5</div>
-                  <span>Containment Executed</span>
-                </div>
-              </div>
+            {/* Sub-Navigation Tabs */}
+            <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
+              <button
+                onClick={() => setActiveTab('workspace')}
+                className={`btn ${activeTab === 'workspace' ? 'btn-primary' : 'btn-outline'}`}
+                style={{ fontSize: '0.78rem' }}
+              >
+                🔬 Investigation Workspace
+              </button>
+              <button
+                onClick={() => setActiveTab('audit')}
+                className={`btn ${activeTab === 'audit' ? 'btn-primary' : 'btn-outline'}`}
+                style={{ fontSize: '0.78rem' }}
+              >
+                🛡️ Decision Ledger (SHA-256)
+              </button>
+              <button
+                onClick={() => setActiveTab('explainability')}
+                className={`btn ${activeTab === 'explainability' ? 'btn-primary' : 'btn-outline'}`}
+                style={{ fontSize: '0.78rem' }}
+              >
+                🧠 AI Explainability Map
+              </button>
+              <button
+                onClick={() => setActiveTab('replay')}
+                className={`btn ${activeTab === 'replay' ? 'btn-primary' : 'btn-outline'}`}
+                style={{ fontSize: '0.78rem' }}
+              >
+                ⏪ Time-Travel Replay
+              </button>
             </div>
+
+            {activeTab === 'audit' && <AuditLedgerViewer incidentId={activeIncident.id} />}
+            {activeTab === 'explainability' && <ExplainabilityMap incidentId={activeIncident.id} />}
+            {activeTab === 'replay' && <ReplayPlayer incidentId={activeIncident.id} />}
+
+            {activeTab === 'workspace' && (
+              <>
+                {/* Pipeline Stage Status Bar */}
+                <div className="card" style={{ padding: '0.9rem 1.25rem' }}>
+                  <div className="pipeline-header">
+                    <div className="pipeline-stage active">
+                      <div className="stage-step">1</div>
+                      <span>Signal Detection</span>
+                    </div>
+                    <div className="pipeline-stage active">
+                      <div className="stage-step">2</div>
+                      <span>Root Cause AI</span>
+                    </div>
+                    <div className="pipeline-stage active">
+                      <div className="stage-step">3</div>
+                      <span>Impact Analysis</span>
+                    </div>
+                    <div className="pipeline-stage active">
+                      <div className="stage-step">4</div>
+                      <span>SOP RAG Retrieval</span>
+                    </div>
+                    <div className={`pipeline-stage ${activeIncident.status === 'CONTAINED' ? 'active' : 'pending'}`}>
+                      <div className="stage-step">5</div>
+                      <span>Containment Executed</span>
+                    </div>
+                  </div>
+                </div>
 
             {/* Header Details Card */}
             <div className="card">
@@ -393,6 +435,8 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({ selectedIncidentId
                 )}
               </div>
             </div>
+            </>
+            )}
           </div>
         ) : (
           <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '300px' }}>

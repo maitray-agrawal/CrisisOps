@@ -88,3 +88,18 @@ Implement `TelemetrySimulator`, `AnomalyDetector`, `MachineStateEngine`, and `In
 ### Rationale
 - Guarantees backend state consistency across all browser windows and API clients.
 - Prevents UI state drift and provides deterministic control for hackathon evaluation and demonstration.
+
+---
+
+## ADR-007: SHA-256 Cryptographic Audit Chaining & Time-Travel Incident Replay
+
+### Context
+Industrial safety regulatory compliance requires tamper-evident logging of all autonomous agent operations, human approvals, and containment actuations, along with the ability to replay historical incidents step-by-step.
+
+### Decision
+Implement `AuditLog` model in SQLite utilizing SHA-256 hash signatures where each entry incorporates the hash of the preceding entry (`previous_hash -> current_hash`). Pair this with an `Incident Replay Engine` that synthesizes time-series snapshots of baseline/anomaly telemetry, agent events, human interventions, and machine state transitions into an interactive playback scrubber.
+
+### Rationale
+- Guarantees verifiable audit integrity against record tampering.
+- Enables high-impact incident post-mortem analysis and interactive time-travel playback during live demonstrations.
+

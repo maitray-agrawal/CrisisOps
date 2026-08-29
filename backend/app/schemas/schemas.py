@@ -168,3 +168,56 @@ class MachineDetailResponse(MachineBase):
     recent_telemetry: List[TelemetryRecordResponse] = []
     maintenance_records: List[MaintenanceRecordResponse] = []
     active_incidents: List[IncidentResponse] = []
+
+
+# --- Audit, Explainability & Replay Schemas ---
+class AuditLogResponse(BaseSchema):
+    id: str
+    incident_id: str
+    timestamp: datetime
+    actor_type: str
+    actor_id: str
+    action_type: str
+    details_json: str
+    previous_hash: str
+    current_hash: str
+
+
+class AuditVerificationResponse(BaseModel):
+    is_valid: bool
+    total_entries: int
+    tampered_entry_id: Optional[str] = None
+    message: str
+
+
+class ExplainabilityReport(BaseModel):
+    incident_id: str
+    machine_id: str
+    hypothesis: str
+    confidence_score: float
+    telemetry_features: List[dict] = []
+    correlated_maintenance: List[dict] = []
+    cited_sop: Optional[dict] = None
+    fallback_used: bool = False
+    reasoning_summary: str
+
+
+class ReplayStep(BaseModel):
+    step_number: int
+    timestamp: datetime
+    vibration_mm_s: float
+    temp_celsius: float
+    output_units_min: float
+    machine_status: str
+    event_title: Optional[str] = None
+    event_type: Optional[str] = None
+    event_actor: Optional[str] = None
+    details: Optional[dict] = None
+
+
+class ReplayTimelineResponse(BaseModel):
+    incident_id: str
+    machine_id: str
+    total_steps: int
+    steps: List[ReplayStep] = []
+

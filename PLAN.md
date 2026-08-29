@@ -13,8 +13,8 @@ Industrial CrisisOps is an AI-powered industrial incident investigation and resp
 | **Phase 1** | Foundation & Synthetic Data Layer | Directory Scaffold, Synthetic Telemetry Generator, SQLite DB Schema, Seed Data | **COMPLETED** |
 | **Phase 2** | Premium Interactive UI/UX Foundation | React Dashboard Shell, Machine Inspector, Incidents Workspace, Dark Industrial Theme | **COMPLETED** |
 | **Phase 3** | Telemetry Anomaly Engine & Live Pipeline | Telemetry Simulator, Explainable Anomaly Detector, State Transitions, Automated Incident Engine, Live Polling | **COMPLETED** |
-| **Phase 4** | Controlled Agent Pipeline, SOP RAG & Human Approval Gate | 4 Sequential Agents (Signal, RCA, Impact, SOP), SOP RAG Retriever, Human Approval Gate, Simulated Actuation | **IN PLANNING** |
-| **Phase 5** | End-to-End M-204 Hackathon Demo Integration | Scripted Machine M-204 Failure Scenario, Full Agent Investigation, Approval & Containment Verification | **PENDING** |
+| **Phase 4** | Controlled Agent Pipeline, SOP RAG & Human Approval Gate | 4 Sequential Agents (Signal, RCA, Impact, SOP), SOP RAG Retriever, Human Approval Gate, Simulated Actuation | **COMPLETED** |
+| **Phase 5** | Auditability, Decision Ledger, Explainability & Incident Replay | SHA-256 Cryptographic Audit Ledger, Explainability RAG Maps, Time-Travel Incident Replay Engine | **IN PLANNING** |
 | **Phase 6** | End-to-End M-204 Demo Integration | Scripted Machine M-204 Bearing Degradation Scenario, Fallback Verification | **PENDING** |
 
 ---

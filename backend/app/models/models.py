@@ -67,6 +67,7 @@ class Incident(Base):
     machine = relationship("Machine", back_populates="incidents")
     evidence_items = relationship("Evidence", back_populates="incident", cascade="all, delete-orphan")
     action_recommendations = relationship("ActionRecommendation", back_populates="incident", cascade="all, delete-orphan")
+    audit_logs = relationship("AuditLog", back_populates="incident", cascade="all, delete-orphan")
 
 
 class Evidence(Base):
@@ -116,3 +117,21 @@ class ActionRecommendation(Base):
     # Relationships
     incident = relationship("Incident", back_populates="action_recommendations")
     sop_document = relationship("SOPDocument", back_populates="action_recommendations")
+
+
+class AuditLog(Base):
+    __tablename__ = "audit_logs"
+
+    id = Column(String, primary_key=True, index=True)  # e.g. "AUD-M204-001"
+    incident_id = Column(String, ForeignKey("incidents.id"), nullable=False, index=True)
+    timestamp = Column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc), index=True)
+    actor_type = Column(String, nullable=False)  # SYSTEM, AGENT_SIGNAL, AGENT_RCA, AGENT_IMPACT, AGENT_SOP, HUMAN_OPERATOR, ACTUATION_ENGINE
+    actor_id = Column(String, nullable=False)    # e.g. "SignalCorrelatorAgent", "Operator: Lead Engineer"
+    action_type = Column(String, nullable=False) # SIGNAL_CORRELATED, RCA_GENERATED, IMPACT_ASSESSED, SOP_MATCHED, OPERATOR_APPROVED, ACTUATION_EXECUTED
+    details_json = Column(Text, nullable=False)  # JSON payload dump
+    previous_hash = Column(String, nullable=False) # SHA-256 hash of previous entry
+    current_hash = Column(String, nullable=False)  # SHA-256 hash of this entry
+
+    # Relationships
+    incident = relationship("Incident", back_populates="audit_logs")
+
