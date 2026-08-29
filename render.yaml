@@ -21,7 +21,7 @@ services:
 
   # 2. React + Vite Frontend Static Site
   - type: web
-    name: crisisops-frontend
+    name: crisisops
     runtime: static
     rootDir: frontend
     buildCommand: npm ci && npm run build
