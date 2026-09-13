@@ -133,6 +133,32 @@ export interface ActionPlan {
   used_fallback: boolean;
 }
 
+export interface IterationTrace {
+  iteration: number;
+  tool_name: string;
+  tool_category: string;
+  decision_rationale: string;
+  observation_summary: string;
+  result_summary: string;
+  status: 'SUCCESS' | 'FAILED' | 'ADAPTED';
+  confidence_score?: number;
+  adaptation_note?: string;
+  timestamp: string;
+}
+
+export interface GoalVerificationCriterion {
+  metric: string;
+  target: string;
+  current: string;
+  status: 'PASS' | 'FAIL';
+}
+
+export interface GoalVerification {
+  goal_achieved: boolean;
+  overall_status?: string;
+  criteria: GoalVerificationCriterion[];
+}
+
 export interface InvestigationResult {
   incident_id: string;
   machine_id: string;
@@ -143,6 +169,16 @@ export interface InvestigationResult {
   retrieved_sop?: SOPDocument;
   pipeline_status: string;
   executed_at: string;
+  goal?: string;
+  agent_status?: string;
+  agent_runtime_trace?: IterationTrace[];
+  selected_tools?: string[];
+  completed_tools?: string[];
+  failed_actions?: Array<{ action: string; reason: string; iteration: number }>;
+  adaptation_events?: Array<{ from_strategy: string; to_strategy: string; reason: string; iteration: number }>;
+  confidence_score?: number;
+  risk_level?: string;
+  verification_results?: GoalVerification;
 }
 
 export interface AuditLogEntry {

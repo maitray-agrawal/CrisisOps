@@ -1,6 +1,10 @@
-# Industrial CrisisOps
+# CrisisOps
 
-### AI-Assisted Industrial Incident Response & Explainable Safety Command Center
+## Agentic Industrial Incident Investigation & Autonomous Recovery
+
+CrisisOps is an agentic AI system that investigates industrial incidents, dynamically selects diagnostic tools, evaluates evidence, recommends policy-controlled recovery actions, adapts when interventions fail, and verifies the resulting system state.
+
+> **Positioning & Operational Scope**: Autonomous investigation and adaptive decision-making with policy-controlled simulated actuation. All physical/industrial actuation is simulated and policy-controlled.
 
 [![Python 3.14](https://img.shields.io/badge/Python-3.14-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115.0-009688.svg)](https://fastapi.tiangolo.com/)
@@ -8,17 +12,47 @@
 [![TypeScript 5.5](https://img.shields.io/badge/TypeScript-5.5.3-blue.svg)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-5.4.21-646CFF.svg)](https://vitejs.dev/)
 [![SQLite](https://img.shields.io/badge/SQLite-Edge-003B57.svg)](https://www.sqlite.org/)
-[![Pytest 8.3](https://img.shields.io/badge/Pytest-31%2F31%20Passed-brightgreen.svg)](https://docs.pytest.org/)
+[![Pytest 8.3](https://img.shields.io/badge/Pytest-38%2F38%20Passed-brightgreen.svg)](https://docs.pytest.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-
-> **Industrial CrisisOps** is an autonomous-capable, human-in-the-loop industrial safety command platform. It bridges continuous SCADA/IoT sensor streams to explainable AI diagnosis, quantified financial impact assessment, automated SOP lookup, non-bypassable safety actuation gates, and a cryptographically verifiable audit trail.
 
 ---
 
-## 📸 Platform Overview & Live Command Center
+### The Agentic Loop
 
-![Industrial CrisisOps Command Center](docs/screenshots/01-dashboard.png)
-*Figure 1: Mission Control Dashboard displaying real-time sensor streams, Z-score anomaly detection, automated agent pipeline status, and safety gates.*
+CrisisOps executes an autonomous closed-loop agent runtime:
+
+```
+Goal
+ ↓
+Observe State
+ ↓
+Evaluate Evidence
+ ↓
+Select Next Tool
+ ↓
+Execute Tool
+ ↓
+Record Result
+ ↓
+Evaluate Outcome
+ ↓
+Goal Achieved?
+ ├── YES → Verify → Resolve
+ └── NO  → Replan / Adapt Strategy → Select Next Tool
+```
+
+### Key Capabilities
+
+* **Dynamic Tool Selection**: The central agent runtime queries a centralized tool registry based on evolving evidence, skipping redundant checks.
+* **Stateful Agent Execution**: Maintains an explicit runtime state tracking goals, hypotheses, completed actions, and failure events.
+* **Evidence-Grounded Investigation**: Correlates high-frequency telemetry Z-score anomalies with historical maintenance work orders.
+* **Operational Knowledge Retrieval**: Evaluates Standard Operating Procedures (SOPs) indexed for target mechanical assemblies.
+* **Failure Recovery & Strategy Adaptation**: Detects execution failure conditions (e.g. locked bypass valve preconditions) and replans with alternative containment procedures.
+* **Risk-Aware Policy Control**: Low-risk diagnostic tools run autonomously; high-risk recovery interventions are gated behind operator approval policies.
+* **Human Authorization (HITL)**: Non-bypassable human approval gate enforced with HTTP 403 server-side validation.
+* **Outcome Verification**: Multi-point quantitative goal verification (machine state, vibration threshold, bearing temperature, production capacity).
+* **Cryptographic Decision Ledger**: Tamper-evident SHA-256 hash chaining records every observation, tool execution, decision, and approval.
+* **Agent Execution Replay**: Time-travel incident replay reproducing state transitions and agent decisions step-by-step.
 
 ---
 
@@ -242,23 +276,26 @@ The application features a built-in 7-Act presentation mode with keyboard shortc
 
 | Claim | Verified Implementation | Source Code Reference | Automated Test / Verification |
 | :--- | :--- | :--- | :--- |
+| **Agent Runtime Loop** | Goal-driven stateful execution with evaluation & replanning | `backend/app/services/agent_runtime.py` | Verified via `test_agent_runtime.py` (7 tests) |
+| **Dynamic Tool Selection** | Stateful tool registry queries based on evidence & state | `backend/app/services/tool_registry.py` | Verified via `test_agent_runtime.py` |
+| **Failure & Adaptive Replanning**| Precondition failure handling & alternative strategy recovery | `backend/app/services/agent_runtime.py` | Test `test_agent_runtime_replan_after_failure` |
+| **Goal Verification** | Multi-point metric PASS/FAIL validation | `backend/app/services/agent_runtime.py` | Test `test_agent_runtime_success_criteria_evaluated` |
 | **Deterministic Telemetry** | 100% reproducible anomaly streams | `backend/app/api/incidents.py#L40-L75` | Verified via `test_agent_pipeline.py` |
 | **Statistical Z-Score** | $Z = (X - \mu)/\sigma \ge 3.0$ | `backend/app/services/detector.py#L45-L89` | Unit test `test_detector_zscore` passed |
-| **4-Stage Agent Pipeline** | Sequential Signal $\rightarrow$ RCA $\rightarrow$ Impact $\rightarrow$ SOP execution | `backend/app/agents/agent_orchestrator.py#L30-L110` | Full end-to-end integration test passed |
 | **Financial Impact Model** | $\$1,875/\text{hr} \times 24.0\text{h} = \$45,000$ | `backend/app/agents/impact_agent.py#L35-L65` | Formula assertion verified in Pytest |
 | **In-Memory SOP RAG** | TF-IDF term overlap score optimization | `backend/app/agents/sop_agent.py#L40-L95` | Verified against `SOP-M204-BEARING` |
-| **Human Approval Invariant** | HTTP 403 Forbidden on unapproved actuation | `backend/app/services/actuation_engine.py#L84-L89` | Safety invariant test passed (Pytest #31) |
+| **Human Approval Invariant** | HTTP 403 Forbidden on unapproved actuation | `backend/app/services/actuation_engine.py#L84-L89` | Safety invariant test passed |
 | **SHA-256 Hash Chaining** | Append-only $H_n = \text{SHA256}(P_n \parallel H_{n-1})$ | `backend/app/services/audit_service.py#L50-L115` | Integrity verification test passed |
 | **Web Crypto Verification** | Real-time browser hash recalculation | `frontend/src/components/HashVerifierModal.tsx#L45-L90` | Verified 0 hash mismatch errors |
 | **Incident Replay** | Chronological telemetry/audit reconstruction | `backend/app/services/replay_service.py#L25-L80` | Replay timeline endpoint tested |
-| **Production Frontend Build** | 0 TypeScript/Vite bundle compilation errors | `frontend/src/index.css` & `frontend/vite.config.ts` | `npm run build` completed in 1.06s |
+| **Production Frontend Build** | 0 TypeScript/Vite bundle compilation errors | `frontend/src/index.css` & `frontend/vite.config.ts` | `npm run build` completed in 0.68s |
 
 ---
 
 ## 🧪 Testing & Build Verification
 
 ### Backend Automated Test Suite
-The backend is verified using `pytest` with 31 comprehensive unit and integration tests:
+The backend is verified using `pytest` with 38 comprehensive unit, runtime, and integration tests:
 
 ```bash
 pytest backend/tests -v
@@ -268,14 +305,15 @@ pytest backend/tests -v
 ============================== test session starts ==============================
 platform win32 -- Python 3.14.0a4, pytest-8.3.4, pluggy-1.5.0
 rootdir: d:\CrisisOps
-collected 31 items
+collected 38 items
 
-backend/tests/test_actuation_engine.py ........                         [ 25%]
-backend/tests/test_agent_pipeline.py ...........                        [ 61%]
-backend/tests/test_audit_service.py ......                             [ 80%]
+backend/tests/test_actuation_engine.py ........                         [ 21%]
+backend/tests/test_agent_pipeline.py ...........                        [ 50%]
+backend/tests/test_agent_runtime.py .......                             [ 68%]
+backend/tests/test_audit_service.py ......                             [ 84%]
 backend/tests/test_detector.py ......                                  [100%]
 
-============================== 31 passed in 1.04s ===============================
+============================== 38 passed in 1.45s ===============================
 ```
 
 ### Frontend Production Build
