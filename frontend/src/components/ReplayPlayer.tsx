@@ -3,6 +3,12 @@ import { apiService } from '../services/api';
 import { ReplayTimeline, ReplayStep } from '../types';
 import { LoadingSpinner } from './LoadingSpinner';
 import { ErrorAlert } from './ErrorAlert';
+import {
+  RewindIcon,
+  PlayIcon,
+  PauseIcon,
+  SkipBackIcon
+} from './Icons';
 
 interface ReplayPlayerProps {
   incidentId: string;
@@ -68,52 +74,53 @@ export const ReplayPlayer: React.FC<ReplayPlayerProps> = ({ incidentId }) => {
   };
 
   return (
-    <div className="space-y-6 bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-2xl">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+    <div className="card" style={{ padding: '1.25rem' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.85rem', flexWrap: 'wrap', gap: '0.75rem' }}>
         <div>
-          <h3 className="text-lg font-bold text-white flex items-center gap-2">
-            <span className="text-cyan-400">⏪</span> Time-Travel Incident Replay Engine
+          <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#fff', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+            <span style={{ color: 'var(--accent-cyan)' }}><RewindIcon size={18} /></span>
+            Time-Travel Incident Replay Engine
           </h3>
-          <p className="text-xs text-slate-400">
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0.2rem 0 0 0' }}>
             Interactive temporal synthesis combining telemetry streams, AI agent interventions, and human approvals.
           </p>
         </div>
-        <div className="flex items-center gap-2 bg-slate-800 border border-slate-700 px-3 py-1 rounded-lg">
-          <span className="text-xs text-slate-400">Timeline Progress:</span>
-          <span className="text-xs font-mono font-bold text-cyan-400">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-color)', padding: '0.35rem 0.75rem', borderRadius: 'var(--radius-md)' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Timeline Progress:</span>
+          <span className="mono" style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent-cyan)' }}>
             Step {currentStepIdx + 1} / {timeline.total_steps}
           </span>
         </div>
       </div>
 
       {/* Telemetry Gauge Display */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-        <div className="p-3 bg-slate-950/60 border border-slate-800 rounded-lg text-center">
-          <div className="text-[10px] text-slate-400 uppercase font-semibold">Vibration</div>
-          <div className={`text-xl font-bold font-mono ${currentStep.vibration_mm_s > 4.5 ? 'text-rose-400' : 'text-emerald-400'}`}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem', marginBottom: '1.25rem' }}>
+        <div style={{ padding: '0.85rem', background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>Vibration</div>
+          <div className="mono" style={{ fontSize: '1.3rem', fontWeight: 700, marginTop: '0.2rem', color: currentStep.vibration_mm_s > 4.5 ? 'var(--status-critical)' : 'var(--status-normal)' }}>
             {currentStep.vibration_mm_s.toFixed(2)} mm/s
           </div>
         </div>
-        <div className="p-3 bg-slate-950/60 border border-slate-800 rounded-lg text-center">
-          <div className="text-[10px] text-slate-400 uppercase font-semibold">Temperature</div>
-          <div className={`text-xl font-bold font-mono ${currentStep.temp_celsius > 80 ? 'text-amber-400' : 'text-emerald-400'}`}>
+
+        <div style={{ padding: '0.85rem', background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>Bearing Temperature</div>
+          <div className="mono" style={{ fontSize: '1.3rem', fontWeight: 700, marginTop: '0.2rem', color: currentStep.temp_celsius > 80 ? 'var(--status-warning)' : 'var(--status-normal)' }}>
             {currentStep.temp_celsius.toFixed(1)} °C
           </div>
         </div>
-        <div className="p-3 bg-slate-950/60 border border-slate-800 rounded-lg text-center">
-          <div className="text-[10px] text-slate-400 uppercase font-semibold">Output Flow</div>
-          <div className="text-xl font-bold font-mono text-cyan-400">
+
+        <div style={{ padding: '0.85rem', background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>Throughput Flow</div>
+          <div className="mono" style={{ fontSize: '1.3rem', fontWeight: 700, marginTop: '0.2rem', color: 'var(--accent-cyan)' }}>
             {currentStep.output_units_min.toFixed(0)} units/min
           </div>
         </div>
-        <div className="p-3 bg-slate-950/60 border border-slate-800 rounded-lg text-center">
-          <div className="text-[10px] text-slate-400 uppercase font-semibold">Machine State</div>
-          <div className="text-xs font-bold font-mono text-white mt-1">
-            <span className={`px-2 py-0.5 rounded ${
-              currentStep.machine_status === 'CRITICAL' ? 'bg-rose-950 border border-rose-600 text-rose-300' :
-              currentStep.machine_status === 'CONTAINED' ? 'bg-emerald-950 border border-emerald-600 text-emerald-300' :
-              'bg-slate-800 text-slate-300'
-            }`}>
+
+        <div style={{ padding: '0.85rem', background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>Machine State</div>
+          <div style={{ marginTop: '0.35rem' }}>
+            <span className={`badge badge-${currentStep.machine_status.toLowerCase()}`}>
               {currentStep.machine_status}
             </span>
           </div>
@@ -121,32 +128,44 @@ export const ReplayPlayer: React.FC<ReplayPlayerProps> = ({ incidentId }) => {
       </div>
 
       {/* Scrubbing Control Bar */}
-      <div className="space-y-3 bg-slate-950/40 p-4 border border-slate-800 rounded-xl">
-        <div className="flex items-center gap-4">
+      <div style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1rem', marginBottom: '1.25rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
           <button
             onClick={() => setIsPlaying(!isPlaying)}
-            className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs rounded-lg transition shadow flex items-center gap-1.5"
+            className="btn btn-primary"
+            style={{ fontSize: '0.8rem', padding: '0.45rem 0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
           >
-            {isPlaying ? '⏸ Pause' : '▶ Play Replay'}
+            {isPlaying ? (
+              <>
+                <PauseIcon size={14} /> Pause
+              </>
+            ) : (
+              <>
+                <PlayIcon size={14} /> Play Replay
+              </>
+            )}
           </button>
           <button
             onClick={() => { setIsPlaying(false); setCurrentStepIdx(0); }}
-            className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg transition"
+            className="btn btn-outline"
+            style={{ fontSize: '0.8rem', padding: '0.45rem 0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
           >
-            ⏮ Reset
+            <SkipBackIcon size={14} /> Reset
           </button>
-          <div className="flex-1 flex items-center gap-3">
+
+          <div style={{ flex: 1, minWidth: '180px', display: 'flex', alignItems: 'center' }}>
             <input
               type="range"
               min={0}
               max={timeline.total_steps - 1}
               value={currentStepIdx}
               onChange={handleSliderChange}
-              className="w-full accent-cyan-400 bg-slate-800 h-2 rounded-lg cursor-pointer"
+              style={{ width: '100%', accentColor: 'var(--accent-cyan)', cursor: 'pointer' }}
             />
           </div>
-          <div className="flex items-center gap-1 text-xs">
-            <span className="text-slate-400">Speed:</span>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem' }}>
+            <span style={{ color: 'var(--text-muted)' }}>Speed:</span>
             {[
               { label: '1x', speed: 1000 },
               { label: '2x', speed: 500 },
@@ -155,11 +174,17 @@ export const ReplayPlayer: React.FC<ReplayPlayerProps> = ({ incidentId }) => {
               <button
                 key={s.label}
                 onClick={() => setPlaybackSpeed(s.speed)}
-                className={`px-2 py-1 rounded text-xs font-mono font-bold ${
-                  playbackSpeed === s.speed
-                    ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/40'
-                    : 'bg-slate-800 text-slate-400 hover:text-white'
-                }`}
+                className="mono"
+                style={{
+                  padding: '0.2rem 0.5rem',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  background: playbackSpeed === s.speed ? 'rgba(6, 182, 212, 0.2)' : 'rgba(255,255,255,0.05)',
+                  color: playbackSpeed === s.speed ? 'var(--accent-cyan)' : 'var(--text-muted)',
+                  border: `1px solid ${playbackSpeed === s.speed ? 'rgba(6, 182, 212, 0.4)' : 'transparent'}`
+                }}
               >
                 {s.label}
               </button>
@@ -169,18 +194,30 @@ export const ReplayPlayer: React.FC<ReplayPlayerProps> = ({ incidentId }) => {
       </div>
 
       {/* Step Event Inspector */}
-      <div className="p-4 bg-slate-950/80 border border-slate-800 rounded-lg space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-xs uppercase font-bold text-amber-400 tracking-wider">
-            Event Log Detail ({currentStep.event_actor || 'System'})
+      <div style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+          <span style={{ fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 700, color: 'var(--status-warning)', letterSpacing: '0.04em' }}>
+            Event Log Detail ({currentStep.event_actor || 'System Engine'})
           </span>
-          <span className="text-xs text-slate-400 font-mono">
+          <span className="mono" style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
             {new Date(currentStep.timestamp).toLocaleTimeString()}
           </span>
         </div>
-        <div className="text-sm font-bold text-white">{currentStep.event_title}</div>
+        <div style={{ fontSize: '0.92rem', fontWeight: 700, color: '#fff', marginBottom: '0.5rem' }}>
+          {currentStep.event_title}
+        </div>
         {currentStep.details && (
-          <pre className="text-[11px] bg-slate-900 border border-slate-800 p-2.5 rounded text-slate-300 font-mono overflow-x-auto">
+          <pre style={{
+            fontSize: '0.75rem',
+            background: 'rgba(0,0,0,0.4)',
+            border: '1px solid rgba(255,255,255,0.06)',
+            padding: '0.75rem',
+            borderRadius: 'var(--radius-sm)',
+            color: 'var(--text-bright)',
+            fontFamily: 'var(--font-mono)',
+            overflowX: 'auto',
+            margin: 0
+          }}>
             {JSON.stringify(currentStep.details, null, 2)}
           </pre>
         )}

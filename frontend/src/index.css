@@ -751,3 +751,66 @@ tr:hover {
   100% { border-color: rgba(239, 68, 68, 0.4); }
 }
 
+.spin-slow {
+  animation: spinSlow 2s linear infinite;
+}
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.sidebar-item-label {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.incident-operations-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.incident-operations-table th {
+  padding: 0.65rem 0.85rem;
+  font-size: 0.72rem;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.incident-operations-table td {
+  padding: 0.75rem 0.85rem;
+  font-size: 0.82rem;
+  vertical-align: middle;
+  height: 48px;
+}
+
+@media (max-width: 1366px) {
+  .search-box {
+    width: 260px;
+  }
+  .top-header {
+    padding: 0.75rem 1rem;
+  }
+  .top-header-actions {
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .top-header {
+    flex-wrap: wrap;
+    height: auto;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+  }
+  .search-box {
+    width: 100%;
+    order: 2;
+  }
+  .top-header-actions {
+    width: 100%;
+    justify-content: space-between;
+    order: 1;
+  }
+}

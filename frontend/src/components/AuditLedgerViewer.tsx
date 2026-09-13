@@ -4,6 +4,15 @@ import { AuditLogEntry, AuditVerificationResponse } from '../types';
 import { LoadingSpinner } from './LoadingSpinner';
 import { ErrorAlert } from './ErrorAlert';
 import { HashVerifierModal } from './HashVerifierModal';
+import {
+  ShieldCheckIcon,
+  LockIcon,
+  CheckCircleIcon,
+  AlertOctagonIcon,
+  SearchIcon,
+  RefreshCwIcon,
+  ClockIcon
+} from './Icons';
 
 interface AuditLedgerViewerProps {
   incidentId: string;
@@ -71,34 +80,38 @@ export const AuditLedgerViewer: React.FC<AuditLedgerViewerProps> = ({ incidentId
   if (loading) return <LoadingSpinner message="Loading SHA-256 Audit Ledger..." />;
   if (error) return <ErrorAlert message={error} onRetry={fetchLogs} />;
 
-  // Derived Ledger Status Badge (Part 4)
-  let ledgerStatusText = '🟡 VERIFICATION PENDING';
+  // Derived Ledger Status Badge
+  let ledgerStatusText = 'VERIFICATION PENDING';
   let ledgerStatusBg = 'rgba(245, 158, 11, 0.15)';
   let ledgerStatusColor = '#f59e0b';
   let ledgerStatusBorder = 'rgba(245, 158, 11, 0.4)';
+  let StatusIcon = ClockIcon;
 
   if (verification) {
     if (verification.is_valid) {
-      ledgerStatusText = '🟢 SHA-256 LEDGER VERIFIED';
+      ledgerStatusText = 'SHA-256 LEDGER VERIFIED';
       ledgerStatusBg = 'rgba(34, 197, 94, 0.15)';
       ledgerStatusColor = '#4ade80';
       ledgerStatusBorder = 'rgba(34, 197, 94, 0.4)';
+      StatusIcon = CheckCircleIcon;
     } else {
-      ledgerStatusText = '🔴 LEDGER INTEGRITY FAILURE';
+      ledgerStatusText = 'LEDGER INTEGRITY FAILURE';
       ledgerStatusBg = 'rgba(239, 68, 68, 0.15)';
       ledgerStatusColor = '#ef4444';
       ledgerStatusBorder = 'rgba(239, 68, 68, 0.4)';
+      StatusIcon = AlertOctagonIcon;
     }
   }
 
   return (
     <div className="card" style={{ padding: '1.25rem' }}>
       {/* Header & Verification Controls */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.25rem' }}>
             <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#fff', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <span style={{ color: 'var(--accent-cyan)' }}>🛡️</span> SHA-256 Cryptographic Decision Ledger
+              <span style={{ color: 'var(--accent-cyan)' }}><ShieldCheckIcon size={18} /></span>
+              SHA-256 Cryptographic Decision Ledger
             </h3>
             {/* Derived Ledger Status Badge */}
             <span
@@ -109,10 +122,13 @@ export const AuditLedgerViewer: React.FC<AuditLedgerViewerProps> = ({ incidentId
                 background: ledgerStatusBg,
                 color: ledgerStatusColor,
                 borderColor: ledgerStatusBorder,
-                fontWeight: 700
+                fontWeight: 700,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem'
               }}
             >
-              {ledgerStatusText}
+              <StatusIcon size={12} /> {ledgerStatusText}
             </span>
           </div>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>
@@ -134,7 +150,15 @@ export const AuditLedgerViewer: React.FC<AuditLedgerViewerProps> = ({ incidentId
             gap: '0.4rem'
           }}
         >
-          {verifying ? '⚡ Verifying Chain...' : '🔒 Verify Ledger Integrity'}
+          {verifying ? (
+            <>
+              <RefreshCwIcon size={14} className="spin-slow" /> Verifying Chain...
+            </>
+          ) : (
+            <>
+              <LockIcon size={14} /> Verify Ledger Integrity
+            </>
+          )}
         </button>
       </div>
 
@@ -149,11 +173,15 @@ export const AuditLedgerViewer: React.FC<AuditLedgerViewerProps> = ({ incidentId
             marginBottom: '1.25rem',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '0.75rem'
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <span style={{ fontSize: '1.4rem' }}>{verification.is_valid ? '✅' : '🚨'}</span>
+            <div style={{ color: verification.is_valid ? '#4ade80' : '#ef4444' }}>
+              {verification.is_valid ? <CheckCircleIcon size={24} /> : <AlertOctagonIcon size={24} />}
+            </div>
             <div>
               <div style={{ fontWeight: 700, fontSize: '0.92rem', color: verification.is_valid ? '#4ade80' : '#ef4444' }}>
                 {verification.is_valid ? 'AUTHORITATIVE SHA-256 HASH CHAIN VALIDATED' : 'TAMPER DETECTED IN AUDIT LEDGER'}
@@ -175,7 +203,7 @@ export const AuditLedgerViewer: React.FC<AuditLedgerViewerProps> = ({ incidentId
           No audit entries recorded for this incident yet.
         </div>
       ) : (
-        <div style={{ overflowX: 'auto' }}>
+        <div className="table-container">
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.8rem' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.72rem', textTransform: 'uppercase' }}>
@@ -263,9 +291,9 @@ export const AuditLedgerViewer: React.FC<AuditLedgerViewerProps> = ({ incidentId
                       <button
                         className="btn btn-outline"
                         onClick={() => handleOpenInspector(log, index)}
-                        style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem' }}
+                        style={{ fontSize: '0.7rem', padding: '0.25rem 0.55rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
                       >
-                        🔍 Inspect
+                        <SearchIcon size={12} /> Inspect
                       </button>
                     </td>
                   </tr>

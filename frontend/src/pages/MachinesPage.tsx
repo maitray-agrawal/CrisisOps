@@ -3,6 +3,14 @@ import { apiService } from '../services/api';
 import { Machine, MachineDetail } from '../types';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorAlert } from '../components/ErrorAlert';
+import {
+  RefreshCwIcon,
+  AlertTriangleIcon,
+  CheckCircleIcon,
+  ActivityIcon,
+  CpuIcon,
+  WrenchIcon
+} from '../components/Icons';
 
 interface MachinesPageProps {
   selectedMachineId?: string | null;
@@ -68,20 +76,28 @@ export const MachinesPage: React.FC<MachinesPageProps> = ({ selectedMachineId })
       {/* Top Header */}
       <div className="page-header">
         <div>
-          <h1 className="page-title">Machine Asset Telemetry & Maintenance Inspector</h1>
-          <p className="page-subtitle">High-Frequency Telemetry Stream, Statistical Z-Scores & Maintenance Record Timeline</p>
+          <h1 className="page-title">Fleet Telemetry & Maintenance Inspector</h1>
+          <p className="page-subtitle">Telemetry Registers, Statistical Z-Scores & Maintenance Record Audit</p>
         </div>
         <div>
-          <button className="btn btn-outline" onClick={() => fetchMachines(true)} style={{ fontSize: '0.8rem' }}>
-            🔄 Refresh Sensor Data
+          <button
+            className="btn btn-outline"
+            onClick={() => fetchMachines(true)}
+            style={{ fontSize: '0.8rem', padding: '0.45rem 0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+          >
+            <RefreshCwIcon size={14} /> Refresh Sensor Data
           </button>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '1.25rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
         {/* Left Side: Asset Selector */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          <div className="card-header-label">Fleet Monitored Assets ({machines.length})</div>
+          <div className="card-header-label">
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <CpuIcon size={14} /> Fleet Monitored Assets ({machines.length})
+            </span>
+          </div>
           {machines.map((machine) => {
             const isSelected = activeMachine?.id === machine.id;
             return (
@@ -110,10 +126,10 @@ export const MachinesPage: React.FC<MachinesPageProps> = ({ selectedMachineId })
 
         {/* Right Side: Machine Telemetry & Maintenance View */}
         {activeMachine ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', gridColumn: 'span 2' }}>
             {/* Machine Header */}
             <div className="card">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                     <span className="mono" style={{ fontSize: '1.1rem', color: 'var(--accent-cyan)', fontWeight: 700 }}>{activeMachine.id}</span>
@@ -136,7 +152,9 @@ export const MachinesPage: React.FC<MachinesPageProps> = ({ selectedMachineId })
             {/* Live Telemetry Stream */}
             <div className="card">
               <div className="card-title">
-                <span>Recent Telemetry Registers</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <ActivityIcon size={14} color="var(--accent-cyan)" /> Recent Telemetry Registers
+                </span>
                 <span className="badge badge-normal" style={{ fontSize: '0.72rem' }}>
                   {activeMachine.recent_telemetry.length} Records Loaded
                 </span>
@@ -167,9 +185,13 @@ export const MachinesPage: React.FC<MachinesPageProps> = ({ selectedMachineId })
                         <td className="mono">{t.output_units_min.toFixed(1)} units/min</td>
                         <td>
                           {t.is_anomaly ? (
-                            <span className="badge badge-critical" style={{ fontSize: '0.68rem' }}>⚠️ ANOMALY DETECTED</span>
+                            <span className="badge badge-critical" style={{ fontSize: '0.68rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+                              <AlertTriangleIcon size={11} /> ANOMALY DETECTED
+                            </span>
                           ) : (
-                            <span className="badge badge-normal" style={{ fontSize: '0.68rem' }}>NOMINAL</span>
+                            <span className="badge badge-normal" style={{ fontSize: '0.68rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+                              <CheckCircleIcon size={11} /> NOMINAL
+                            </span>
                           )}
                         </td>
                       </tr>
@@ -182,7 +204,9 @@ export const MachinesPage: React.FC<MachinesPageProps> = ({ selectedMachineId })
             {/* Maintenance History */}
             <div className="card">
               <div className="card-title">
-                <span>Historical Maintenance Logs</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <WrenchIcon size={14} color="var(--status-warning)" /> Historical Maintenance Logs
+                </span>
                 <span className="badge badge-normal" style={{ fontSize: '0.72rem' }}>
                   {activeMachine.maintenance_records.length} History Logs
                 </span>
@@ -229,4 +253,3 @@ export const MachinesPage: React.FC<MachinesPageProps> = ({ selectedMachineId })
     </div>
   );
 };
-

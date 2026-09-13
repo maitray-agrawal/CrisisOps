@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { apiService } from '../services/api';
-
-interface DemoGuideModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onNavigateToTab: (tab: 'dashboard' | 'incidents' | 'machines' | 'sops') => void;
-}
+import { NavigationTab } from './Layout';
+import { XIcon } from './Icons';
 
 interface DemoStep {
   act: number;
@@ -14,8 +10,14 @@ interface DemoStep {
   description: string;
   keyMetric: string;
   actionText?: string;
-  actionType?: 'trigger' | 'tick' | 'reset' | 'navigate_incidents' | 'navigate_dashboard';
-  targetTab?: 'dashboard' | 'incidents' | 'machines' | 'sops';
+  actionType?: 'trigger' | 'tick' | 'reset' | 'navigate_incidents';
+  targetTab?: NavigationTab;
+}
+
+interface DemoGuideModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onNavigateToTab: (tab: NavigationTab) => void;
 }
 
 const DEMO_STEPS: DemoStep[] = [
@@ -25,7 +27,7 @@ const DEMO_STEPS: DemoStep[] = [
     subtitle: 'Baseline Health & Asset Monitoring',
     description: 'Inspect the Operations Command Center. Monitored assets (M-204 Centrifugal Compressor, M-101 Water Pump, M-305 Turbine) are running in green NORMAL state.',
     keyMetric: 'M-204 Vibration: ~1.8 mm/s | Temp: ~52.0°C | Status: NORMAL',
-    actionText: '🔄 Verify Baseline Operations',
+    actionText: 'Verify Baseline Operations',
     actionType: 'reset',
     targetTab: 'dashboard'
   },
@@ -35,7 +37,7 @@ const DEMO_STEPS: DemoStep[] = [
     subtitle: 'Simulate Industrial Degradation',
     description: 'Trigger the M-204 bearing degradation sequence. Mechanical degradation begins immediately across vibration, temperature, and output metrics.',
     keyMetric: 'M-204 Vibration: Spiking towards 7.82 mm/s | Temp: 88.4°C',
-    actionText: '🔥 Trigger M-204 Failure',
+    actionText: 'Trigger M-204 Failure Scenario',
     actionType: 'trigger',
     targetTab: 'dashboard'
   },
@@ -43,9 +45,9 @@ const DEMO_STEPS: DemoStep[] = [
     act: 3,
     title: 'Act 3 — Real-Time Anomaly & Incident Detection',
     subtitle: 'Statistical Threshold Breached',
-    description: 'The Anomaly Detection Engine identifies critical vibration and temperature threshold breaches, automatically transitioning M-204 state to CRITICAL and opening incident ticket INC-2026-001.',
-    keyMetric: 'Machine State: CRITICAL | Active Incidents: 1 (INC-2026-001)',
-    actionText: '🚨 View Incidents Workspace',
+    description: 'The Anomaly Detection Engine identifies critical vibration and temperature threshold breaches, automatically transitioning M-204 state to CRITICAL and opening incident ticket INC-M204-001.',
+    keyMetric: 'Machine State: CRITICAL | Active Incidents: 1 (INC-M204-001)',
+    actionText: 'View Incidents Operations Queue',
     actionType: 'navigate_incidents',
     targetTab: 'incidents'
   },
@@ -53,9 +55,9 @@ const DEMO_STEPS: DemoStep[] = [
     act: 4,
     title: 'Act 4 — 4-Stage AI Agent Investigation',
     subtitle: 'Autonomous Multi-Agent Analysis',
-    description: 'The 4-stage agent pipeline executes sequentially: Signal Correlator $\rightarrow$ Root Cause Analysis (92% confidence) $\rightarrow$ Business Impact ($45,000 risk) $\rightarrow$ SOP RAG Retrieval (SOP-COMP-001).',
-    keyMetric: 'Hypothesis: Centrifugal Compressor Bearing Failure (92% Confidence)',
-    actionText: '🔬 Inspect Investigation Pipeline',
+    description: 'The 4-stage agent pipeline executes sequentially: Signal Correlator → Root Cause Analysis (89% confidence) → Business Impact ($45,000 risk) → SOP RAG Retrieval (SOP-M204-BEARING).',
+    keyMetric: 'Hypothesis: Centrifugal Compressor Bearing Failure (89% Confidence)',
+    actionText: 'Inspect Investigation Pipeline',
     actionType: 'navigate_incidents',
     targetTab: 'incidents'
   },
@@ -63,9 +65,9 @@ const DEMO_STEPS: DemoStep[] = [
     act: 5,
     title: 'Act 5 — Human-in-the-Loop Approval Gate',
     subtitle: 'Industrial Safety Boundary Enforced',
-    description: 'The platform prohibits autonomous physical actuation. The response plan is locked until the Shift Operator reviews evidence, verifies SOP-COMP-001, and toggles explicit authorization.',
+    description: 'The platform prohibits autonomous physical actuation. The response plan is locked until the Shift Operator reviews evidence, verifies SOP-M204-BEARING, and toggles explicit authorization.',
     keyMetric: 'Gate Lock Status: REQUIRES OPERATOR APPROVAL',
-    actionText: '🛡️ Review Approval Gate',
+    actionText: 'Review Approval Gate',
     actionType: 'navigate_incidents',
     targetTab: 'incidents'
   },
@@ -75,7 +77,7 @@ const DEMO_STEPS: DemoStep[] = [
     subtitle: 'Software-Guided Containment Execution',
     description: 'Upon operator approval, execute the simulated containment action (Lockout & Lubrication Flush). Machine M-204 transitions to CONTAINED and telemetry graphs return to green baseline.',
     keyMetric: 'Machine State: CONTAINED | Vibration Restored: 1.8 mm/s',
-    actionText: '⚡ Execute Containment Action',
+    actionText: 'Execute Containment Action',
     actionType: 'navigate_incidents',
     targetTab: 'incidents'
   },
@@ -85,7 +87,7 @@ const DEMO_STEPS: DemoStep[] = [
     subtitle: 'SHA-256 Auditability & Explainability',
     description: 'Inspect the tamper-evident SHA-256 Decision Ledger, review the grounded RAG Explainability Map, and scrub step-by-step through the Incident Time-Travel Replay player.',
     keyMetric: 'Ledger Status: 100% SHA-256 VERIFIED | Cryptographic Chain Valid',
-    actionText: '⏪ Open Decision Ledger & Replay',
+    actionText: 'Open Decision Ledger & Replay',
     actionType: 'navigate_incidents',
     targetTab: 'incidents'
   }
@@ -236,11 +238,12 @@ export const DemoGuideModal: React.FC<DemoGuideModalProps> = ({
               background: 'transparent',
               border: 'none',
               color: 'var(--text-muted)',
-              fontSize: '1.2rem',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center'
             }}
           >
-            ✕
+            <XIcon size={18} />
           </button>
         </div>
 
@@ -261,19 +264,19 @@ export const DemoGuideModal: React.FC<DemoGuideModalProps> = ({
               className={`btn ${activeTab === 'walkthrough' ? 'btn-primary' : 'btn-outline'}`}
               style={{ fontSize: '0.75rem', padding: '0.3rem 0.75rem' }}
             >
-              🎬 7-Act Script
+              7-Act Flow
             </button>
             <button
               onClick={() => setActiveTab('pitch')}
               className={`btn ${activeTab === 'pitch' ? 'btn-primary' : 'btn-outline'}`}
               style={{ fontSize: '0.75rem', padding: '0.3rem 0.75rem' }}
             >
-              🏆 JUDGE PITCH & ARCHITECTURE
+              System Architecture & Pitch
             </button>
           </div>
 
           <div className="mono" style={{ fontSize: '0.7rem', color: 'var(--accent-cyan)' }}>
-            ⌨️ Keys <strong style={{ color: '#fff' }}>[1–7]</strong> Act • <strong style={{ color: '#fff' }}>[←/→]</strong> Nav • <strong style={{ color: '#fff' }}>[Esc]</strong> Close
+            Keys <strong style={{ color: '#fff' }}>[1–7]</strong> Act • <strong style={{ color: '#fff' }}>[←/→]</strong> Nav • <strong style={{ color: '#fff' }}>[Esc]</strong> Close
           </div>
         </div>
 
@@ -292,10 +295,10 @@ export const DemoGuideModal: React.FC<DemoGuideModalProps> = ({
                 }}
               >
                 <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>
-                  🎯 VALUE PROPOSITION & JUDGE PITCH
+                  Core Value Proposition
                 </div>
-                <p style={{ fontSize: '0.98rem', color: '#fff', lineHeight: '1.55', margin: 0, fontWeight: 500 }}>
-                  "Industrial CrisisOps is the mission-control AI platform that transforms noisy plant telemetry into grounded incident response—guarded by human approval and cryptographic auditability."
+                <p style={{ fontSize: '0.95rem', color: '#fff', lineHeight: '1.55', margin: 0, fontWeight: 500 }}>
+                  "Industrial CrisisOps is the mission-control AI command center that transforms high-frequency plant telemetry into grounded, explainable incident response—strictly bounded by human-in-the-loop authorization and tamper-evident SHA-256 cryptographic auditability."
                 </p>
               </div>
 
@@ -309,7 +312,7 @@ export const DemoGuideModal: React.FC<DemoGuideModalProps> = ({
                 }}
               >
                 <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.85rem' }}>
-                  🏗️ END-TO-END SYSTEM ARCHITECTURE
+                  End-to-End System Architecture
                 </div>
                 <div
                   style={{
@@ -329,59 +332,57 @@ export const DemoGuideModal: React.FC<DemoGuideModalProps> = ({
                     Anomaly Detection
                   </span>
                   <span style={{ color: 'var(--text-muted)' }}>→</span>
-                  <span style={{ background: 'rgba(168,85,247,0.15)', color: '#c084fc', border: '1px solid rgba(168,85,247,0.3)', padding: '4px 8px', borderRadius: '4px' }}>
-                    Multi-Agent RCA
-                  </span>
-                  <span style={{ color: 'var(--text-muted)' }}>→</span>
                   <span style={{ background: 'rgba(59,130,246,0.15)', color: '#60a5fa', border: '1px solid rgba(59,130,246,0.3)', padding: '4px 8px', borderRadius: '4px' }}>
-                    SOP Grounding
+                    Incident Ticket
                   </span>
                   <span style={{ color: 'var(--text-muted)' }}>→</span>
-                  <span style={{ background: 'rgba(239,68,68,0.15)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)', padding: '4px 8px', borderRadius: '4px' }}>
-                    Human Approval
+                  <span style={{ background: 'rgba(139,92,246,0.15)', color: '#c084fc', border: '1px solid rgba(139,92,246,0.3)', padding: '4px 8px', borderRadius: '4px' }}>
+                    4-Stage AI Pipeline
+                  </span>
+                  <span style={{ color: 'var(--text-muted)' }}>→</span>
+                  <span style={{ background: 'rgba(239,68,68,0.15)', color: '#f87171', border: '1px solid rgba(239,68,68,0.3)', padding: '4px 8px', borderRadius: '4px' }}>
+                    Human Approval Gate
                   </span>
                   <span style={{ color: 'var(--text-muted)' }}>→</span>
                   <span style={{ background: 'rgba(34,197,94,0.15)', color: '#4ade80', border: '1px solid rgba(34,197,94,0.3)', padding: '4px 8px', borderRadius: '4px' }}>
                     Actuation
                   </span>
                   <span style={{ color: 'var(--text-muted)' }}>→</span>
-                  <span style={{ background: 'rgba(16,185,129,0.15)', color: '#10b981', border: '1px solid rgba(16,185,129,0.3)', padding: '4px 8px', borderRadius: '4px' }}>
+                  <span style={{ background: 'rgba(6,182,212,0.15)', color: 'var(--accent-cyan)', border: '1px solid rgba(6,182,212,0.3)', padding: '4px 8px', borderRadius: '4px' }}>
                     SHA-256 Ledger
-                  </span>
-                  <span style={{ color: 'var(--text-muted)' }}>→</span>
-                  <span style={{ background: 'rgba(236,72,153,0.15)', color: '#f472b6', border: '1px solid rgba(236,72,153,0.3)', padding: '4px 8px', borderRadius: '4px' }}>
-                    Incident Replay
                   </span>
                 </div>
               </div>
             </div>
           ) : (
             <>
-              <div style={{ fontSize: '0.8rem', color: 'var(--accent-cyan)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.25rem' }}>
-                {currentStep.subtitle}
+              {/* Act Header */}
+              <div style={{ marginBottom: '1.25rem' }}>
+                <div style={{ fontSize: '0.8rem', color: 'var(--accent-cyan)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  {currentStep.subtitle}
+                </div>
+                <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: '#fff', margin: '0.2rem 0 0.5rem 0' }}>
+                  {currentStep.title}
+                </h2>
+                <p style={{ fontSize: '0.9rem', color: 'var(--text-bright)', lineHeight: '1.55', margin: 0 }}>
+                  {currentStep.description}
+                </p>
               </div>
-              <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#fff', margin: '0 0 1rem 0' }}>
-                {currentStep.title}
-              </h2>
 
-              <p style={{ color: '#cbd5e1', fontSize: '0.92rem', lineHeight: '1.6', marginBottom: '1.25rem' }}>
-                {currentStep.description}
-              </p>
-
+              {/* Key Metric Box */}
               <div
                 style={{
-                  background: 'rgba(15, 23, 42, 0.8)',
-                  border: '1px solid var(--border-color)',
-                  borderLeft: '4px solid var(--accent-cyan)',
-                  borderRadius: '6px',
-                  padding: '0.9rem 1.1rem',
+                  background: 'rgba(6, 182, 212, 0.08)',
+                  border: '1px solid rgba(6, 182, 212, 0.25)',
+                  borderRadius: '8px',
+                  padding: '0.85rem 1.1rem',
                   marginBottom: '1.5rem',
-                  fontFamily: 'monospace',
+                  fontFamily: 'var(--font-mono)',
                   fontSize: '0.85rem',
                   color: 'var(--accent-cyan)'
                 }}
               >
-                🎯 <strong>Key Demo Focus:</strong> {currentStep.keyMetric}
+                <strong>Key Demonstration Metric:</strong> {currentStep.keyMetric}
               </div>
 
               {/* Action Trigger Button */}
@@ -421,9 +422,9 @@ export const DemoGuideModal: React.FC<DemoGuideModalProps> = ({
                   className="btn btn-outline"
                   disabled={currentStepIndex === 0}
                   onClick={() => setCurrentStepIndex((prev) => Math.max(0, prev - 1))}
-                  style={{ opacity: currentStepIndex === 0 ? 0.4 : 1 }}
+                  style={{ opacity: currentStepIndex === 0 ? 0.4 : 1, fontSize: '0.8rem' }}
                 >
-                  ⬅️ Previous Act
+                  Previous Act
                 </button>
 
                 <div style={{ display: 'flex', gap: '6px' }}>
@@ -456,9 +457,9 @@ export const DemoGuideModal: React.FC<DemoGuideModalProps> = ({
                   className="btn btn-primary"
                   disabled={currentStepIndex === DEMO_STEPS.length - 1}
                   onClick={() => setCurrentStepIndex((prev) => Math.min(DEMO_STEPS.length - 1, prev + 1))}
-                  style={{ opacity: currentStepIndex === DEMO_STEPS.length - 1 ? 0.4 : 1 }}
+                  style={{ opacity: currentStepIndex === DEMO_STEPS.length - 1 ? 0.4 : 1, fontSize: '0.8rem' }}
                 >
-                  Next Act ➡️
+                  Next Act
                 </button>
               </div>
             </>
