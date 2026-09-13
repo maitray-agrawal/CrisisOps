@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from typing import Dict, Any
 from sqlalchemy.orm import Session
-from app.models.models import Incident, Machine, ActionRecommendation
+from app.models.models import Incident, Machine, ActionRecommendation, TelemetryRecord
 from app.services.telemetry import TelemetrySimulator
 from app.services.audit_service import AuditService
 
@@ -97,10 +97,22 @@ class ActuationEngine:
 
         # Stabilize telemetry stream back to healthy baseline
         TelemetrySimulator.set_scenario_mode("NORMAL")
+        now = datetime.now(timezone.utc)
+
+        # Generate immediate post-containment telemetry record
+        stabilized_record = TelemetryRecord(
+            machine_id=incident.machine_id,
+            timestamp=now,
+            vibration_mm_s=1.82,
+            temp_celsius=52.4,
+            output_units_min=98.5,
+            is_anomaly=False
+        )
+        db.add(stabilized_record)
 
         # Mark incident resolved / contained
         incident.status = "CONTAINED"
-        incident.resolved_at = datetime.now(timezone.utc)
+        incident.resolved_at = now
 
         for rec in recommendations:
             rec.simulation_executed = True

@@ -338,6 +338,7 @@ class ToolRegistry:
 
         return {
             "goal_achieved": all_passed,
+            "overall_status": "GOAL ACHIEVED" if all_passed else "GOAL NOT ACHIEVED",
             "criteria": [
                 {
                     "metric": "Machine Operating State",

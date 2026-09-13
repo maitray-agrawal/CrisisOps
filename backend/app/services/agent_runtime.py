@@ -347,7 +347,8 @@ class AgentRuntime:
             f"RCA Hypothesis ({confidence:.0f}% Confidence): {hypothesis} | "
             f"Risk: ${loss:,.0f} USD financial exposure | Strategy Adapted: Precondition lock resolved via valve override."
         )
-        incident.status = "PENDING_APPROVAL"
+        if incident.status not in ["CONTAINED", "RESOLVED"]:
+            incident.status = "PENDING_APPROVAL"
 
         # Persist Evidence Items if missing
         existing_evi = db.query(Evidence).filter(Evidence.incident_id == incident.id).all()
