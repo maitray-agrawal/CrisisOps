@@ -1,5 +1,6 @@
 import React from 'react';
 import { InvestigationResult } from '../types';
+import { Cpu, Zap, CheckCircle2, AlertTriangle } from 'lucide-react';
 
 interface AgentStepperProps {
   isInvestigating: boolean;
@@ -57,26 +58,28 @@ export const AgentStepper: React.FC<AgentStepperProps> = ({
 
   return (
     <div className="card" style={{ padding: '1.25rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
         <div>
-          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            🤖 EXPLAINABLE MULTI-AGENT EXECUTION PIPELINE
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <Cpu size={15} />
+            <span>EXPLAINABLE MULTI-AGENT EXECUTION PIPELINE</span>
           </div>
           <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: '0.2rem 0 0 0' }}>
-            Sequential 4-Stage AI Pipeline: Telemetry Correlation $\rightarrow$ Root Cause $\rightarrow$ Impact $\rightarrow$ Grounded SOP RAG
+            Sequential 4-Stage AI Pipeline: Telemetry Correlation &rarr; Root Cause &rarr; Impact &rarr; Grounded SOP RAG
           </p>
         </div>
         <button
           className="btn btn-primary"
           disabled={isInvestigating}
           onClick={onRunPipeline}
-          style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+          style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem', background: '#2563eb', borderColor: '#2563eb' }}
         >
-          {isInvestigating ? '⚡ Running 4-Agent Chain...' : '⚡ Trigger AI Pipeline'}
+          <Zap size={14} />
+          {isInvestigating ? 'Running 4-Agent Chain...' : 'Trigger AI Pipeline'}
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.85rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.85rem' }}>
         {steps.map((step) => {
           let stepStatus: 'IDLE' | 'RUNNING' | 'COMPLETE' | 'FALLBACK' = 'IDLE';
           if (isInvestigating) {
@@ -117,7 +120,10 @@ export const AgentStepper: React.FC<AgentStepperProps> = ({
                     className="badge"
                     style={{
                       fontSize: '0.65rem',
-                      padding: '0.15rem 0.4rem',
+                      padding: '0.15rem 0.45rem',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.25rem',
                       background:
                         stepStatus === 'RUNNING'
                           ? 'rgba(6, 182, 212, 0.15)'
@@ -144,7 +150,10 @@ export const AgentStepper: React.FC<AgentStepperProps> = ({
                           : 'var(--border-color)'
                     }}
                   >
-                    {stepStatus === 'RUNNING' ? '⚡ RUNNING' : stepStatus === 'COMPLETE' ? '✓ COMPLETE' : stepStatus === 'FALLBACK' ? '⚠️ FALLBACK' : 'IDLE'}
+                    {stepStatus === 'RUNNING' && <Zap size={11} />}
+                    {stepStatus === 'COMPLETE' && <CheckCircle2 size={11} />}
+                    {stepStatus === 'FALLBACK' && <AlertTriangle size={11} />}
+                    <span>{stepStatus === 'RUNNING' ? 'RUNNING' : stepStatus === 'COMPLETE' ? 'COMPLETE' : stepStatus === 'FALLBACK' ? 'FALLBACK' : 'IDLE'}</span>
                   </span>
                 </div>
 
@@ -171,3 +180,5 @@ export const AgentStepper: React.FC<AgentStepperProps> = ({
     </div>
   );
 };
+
+export default AgentStepper;

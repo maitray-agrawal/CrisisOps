@@ -3,9 +3,10 @@ import { Layout, NavigationTab } from './components/Layout';
 import { DashboardPage } from './pages/DashboardPage';
 import { IncidentsPage } from './pages/IncidentsPage';
 import { MachinesPage } from './pages/MachinesPage';
+import { TrendingUp, BookOpen } from 'lucide-react';
 
 export const App: React.FC = () => {
-  const [currentTab, setCurrentTab] = useState<NavigationTab>('dashboard');
+  const [currentTab, setCurrentTab] = useState<NavigationTab>('incidents');
   const [selectedIncidentId, setSelectedIncidentId] = useState<string | null>('INC-M204-001');
   const [selectedMachineId, setSelectedMachineId] = useState<string | null>('M-204');
 
@@ -46,19 +47,22 @@ export const App: React.FC = () => {
           <div className="page-header">
             <div>
               <h1 className="page-title">SOP Knowledge Retrieval Library</h1>
-              <p className="page-subtitle">Indexed Standard Operating Procedures & Engineering Manuals</p>
+              <p className="page-subtitle">Indexed Standard Operating Procedures &amp; Engineering Manuals</p>
             </div>
           </div>
           <div className="card">
-            <div className="card-header-label">SOP Index (In-Memory Vector DB)</div>
+            <div className="card-header-label" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <BookOpen size={15} style={{ color: 'var(--accent-cyan)' }} />
+              <span>SOP Index (In-Memory Vector DB)</span>
+            </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
               <div style={{ padding: '1rem', background: 'var(--bg-surface-elevated)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontWeight: 700, color: 'var(--accent-cyan)' }}>SOP-M204-BEARING</span>
                   <span className="badge badge-normal">INDEXED</span>
                 </div>
-                <div style={{ fontSize: '0.9rem', fontWeight: 600, color: '#fff', marginTop: '0.4rem' }}>Hydraulic Drive & Bearing Failure Emergency Containment</div>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>Covers vibration spikes &gt;4.5 mm/s, bearing temperature exceeding 75°C, and auxiliary coolant flush procedures.</p>
+                <div style={{ fontSize: '0.9rem', fontWeight: 600, color: '#fff', marginTop: '0.4rem' }}>Hydraulic Drive &amp; Bearing Failure Emergency Containment</div>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>Covers vibration spikes &gt;4.5 mm/s, bearing temperature exceeding 75&deg;C, and auxiliary coolant flush procedures.</p>
               </div>
               <div style={{ padding: '1rem', background: 'var(--bg-surface-elevated)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -76,14 +80,16 @@ export const App: React.FC = () => {
         <div className="page-container">
           <div className="page-header">
             <div>
-              <h1 className="page-title">Predictive Anomaly & Fleet Analytics</h1>
-              <p className="page-subtitle">Z-Score & EWMA Anomaly Trend Analysis</p>
+              <h1 className="page-title">Predictive Anomaly &amp; Fleet Analytics</h1>
+              <p className="page-subtitle">Z-Score &amp; EWMA Anomaly Trend Analysis</p>
             </div>
           </div>
           <div className="card">
             <div className="card-header-label">Telemetry Predictive Graph</div>
             <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📈</div>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.75rem' }}>
+                <TrendingUp size={36} style={{ color: 'var(--accent-cyan)' }} />
+              </div>
               <h3>Continuous Statistical Anomaly Engine</h3>
               <p style={{ fontSize: '0.85rem', marginTop: '0.4rem' }}>Monitoring Machine M-204, M-101, M-305 at 1-second interval sampling rate.</p>
             </div>
@@ -111,4 +117,3 @@ export const App: React.FC = () => {
 };
 
 export default App;
-

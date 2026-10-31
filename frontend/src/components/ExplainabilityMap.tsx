@@ -3,6 +3,7 @@ import { apiService } from '../services/api';
 import { ExplainabilityReport } from '../types';
 import { LoadingSpinner } from './LoadingSpinner';
 import { ErrorAlert } from './ErrorAlert';
+import { Brain, TrendingUp, Wrench, BookOpen } from 'lucide-react';
 
 interface ExplainabilityMapProps {
   incidentId: string;
@@ -37,50 +38,53 @@ export const ExplainabilityMap: React.FC<ExplainabilityMapProps> = ({ incidentId
   if (!report) return null;
 
   return (
-    <div className="space-y-6 bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-2xl">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+    <div className="card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.85rem', flexWrap: 'wrap', gap: '0.75rem' }}>
         <div>
-          <h3 className="text-lg font-bold text-white flex items-center gap-2">
-            <span className="text-amber-400">🧠</span> AI Root Cause Explainability Map
+          <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#fff', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Brain size={20} style={{ color: 'var(--accent-cyan)' }} />
+            AI Root Cause Explainability Map
           </h3>
-          <p className="text-xs text-slate-400">
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0.2rem 0 0 0' }}>
             Surfacing feature attribution weights, RAG SOP citations, and multi-agent reasoning evidence.
           </p>
         </div>
-        <div className="flex items-center gap-2 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-lg">
-          <span className="text-xs text-slate-400">Confidence Score:</span>
-          <span className="text-sm font-extrabold text-emerald-400">{report.confidence_score}%</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-color)', padding: '0.35rem 0.75rem', borderRadius: '6px' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Confidence Score:</span>
+          <span style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--status-normal)' }}>{report.confidence_score}%</span>
         </div>
       </div>
 
       {/* Hypothesis & Reasoning Summary */}
-      <div className="p-4 bg-slate-950/60 border border-slate-800 rounded-lg space-y-2">
-        <div className="text-xs uppercase font-bold text-cyan-400 tracking-wider">Primary RCA Hypothesis</div>
-        <p className="text-sm text-slate-200 font-semibold">{report.hypothesis}</p>
-        <div className="text-xs text-slate-400 leading-relaxed pt-1">
+      <div style={{ padding: '1rem', background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
+        <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 700, color: 'var(--accent-cyan)', letterSpacing: '0.05em', marginBottom: '0.4rem' }}>
+          PRIMARY RCA HYPOTHESIS
+        </div>
+        <p style={{ fontSize: '0.9rem', color: '#fff', fontWeight: 600, margin: '0 0 0.4rem 0' }}>{report.hypothesis}</p>
+        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
           {report.reasoning_summary}
         </div>
       </div>
 
       {/* Feature Attribution Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem' }}>
         {/* Telemetry Anomalies */}
-        <div className="bg-slate-950/40 border border-slate-800 rounded-lg p-4 space-y-3">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
-            <span>📈</span> Telemetry Anomaly Evidence
+        <div style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1rem' }}>
+          <h4 style={{ margin: '0 0 0.75rem 0', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--status-critical)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <TrendingUp size={14} />
+            <span>Telemetry Anomaly Evidence</span>
           </h4>
-          <div className="space-y-2">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             {report.telemetry_features.map((feat, idx) => (
-              <div key={idx} className="p-2.5 bg-slate-900 border border-slate-800 rounded text-xs space-y-1">
-                <div className="flex justify-between font-bold text-slate-300">
+              <div key={idx} style={{ padding: '0.65rem', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, fontSize: '0.8rem', color: '#fff', marginBottom: '0.2rem' }}>
                   <span>{feat.title}</span>
-                  <span className="text-rose-400 font-mono">Weight: {(feat.confidence * 100).toFixed(0)}%</span>
+                  <span className="mono" style={{ color: 'var(--status-critical)' }}>Weight: {(feat.confidence * 100).toFixed(0)}%</span>
                 </div>
-                <p className="text-slate-400">{feat.description}</p>
-                <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1">
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0 0 0.4rem 0' }}>{feat.description}</p>
+                <div style={{ width: '100%', background: 'rgba(255,255,255,0.1)', height: '4px', borderRadius: '2px', overflow: 'hidden' }}>
                   <div
-                    className="bg-rose-500 h-full rounded-full"
-                    style={{ width: `${feat.confidence * 100}%` }}
+                    style={{ background: 'var(--status-critical)', height: '100%', borderRadius: '2px', width: `${feat.confidence * 100}%` }}
                   />
                 </div>
               </div>
@@ -89,22 +93,22 @@ export const ExplainabilityMap: React.FC<ExplainabilityMapProps> = ({ incidentId
         </div>
 
         {/* Maintenance Correlation */}
-        <div className="bg-slate-950/40 border border-slate-800 rounded-lg p-4 space-y-3">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-            <span>🔧</span> Maintenance Log Attribution
+        <div style={{ background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1rem' }}>
+          <h4 style={{ margin: '0 0 0.75rem 0', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--status-warning)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <Wrench size={14} />
+            <span>Maintenance Log Attribution</span>
           </h4>
-          <div className="space-y-2">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             {report.correlated_maintenance.map((maint, idx) => (
-              <div key={idx} className="p-2.5 bg-slate-900 border border-slate-800 rounded text-xs space-y-1">
-                <div className="flex justify-between font-bold text-slate-300">
+              <div key={idx} style={{ padding: '0.65rem', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, fontSize: '0.8rem', color: '#fff', marginBottom: '0.2rem' }}>
                   <span>{maint.title}</span>
-                  <span className="text-amber-400 font-mono">Weight: {(maint.confidence * 100).toFixed(0)}%</span>
+                  <span className="mono" style={{ color: 'var(--status-warning)' }}>Weight: {(maint.confidence * 100).toFixed(0)}%</span>
                 </div>
-                <p className="text-slate-400">{maint.description}</p>
-                <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1">
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0 0 0.4rem 0' }}>{maint.description}</p>
+                <div style={{ width: '100%', background: 'rgba(255,255,255,0.1)', height: '4px', borderRadius: '2px', overflow: 'hidden' }}>
                   <div
-                    className="bg-amber-500 h-full rounded-full"
-                    style={{ width: `${maint.confidence * 100}%` }}
+                    style={{ background: 'var(--status-warning)', height: '100%', borderRadius: '2px', width: `${maint.confidence * 100}%` }}
                   />
                 </div>
               </div>
@@ -115,15 +119,16 @@ export const ExplainabilityMap: React.FC<ExplainabilityMapProps> = ({ incidentId
 
       {/* Cited SOP Citation Block */}
       {report.cited_sop && (
-        <div className="p-4 bg-gradient-to-r from-cyan-950/30 to-teal-950/30 border border-cyan-500/30 rounded-lg space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs uppercase font-bold text-cyan-400 flex items-center gap-1.5">
-              <span>📚</span> Grounded SOP Citation ({report.cited_sop.code})
+        <div style={{ padding: '1rem', background: 'rgba(6, 182, 212, 0.08)', border: '1px solid rgba(6, 182, 212, 0.3)', borderRadius: 'var(--radius-md)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <span style={{ fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 700, color: 'var(--accent-cyan)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <BookOpen size={14} />
+              <span>Grounded SOP Citation ({report.cited_sop.code})</span>
             </span>
-            <span className="text-xs text-slate-400">Component: {report.cited_sop.target_component}</span>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Component: {report.cited_sop.target_component}</span>
           </div>
-          <div className="text-sm font-bold text-white">{report.cited_sop.title}</div>
-          <p className="text-xs text-slate-300 italic border-l-2 border-cyan-400 pl-3 py-1">
+          <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#fff', marginBottom: '0.35rem' }}>{report.cited_sop.title}</div>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-bright)', fontStyle: 'italic', borderLeft: '2px solid var(--accent-cyan)', paddingLeft: '0.75rem', margin: 0 }}>
             "{report.cited_sop.snippet}"
           </p>
         </div>
@@ -131,3 +136,5 @@ export const ExplainabilityMap: React.FC<ExplainabilityMapProps> = ({ incidentId
     </div>
   );
 };
+
+export default ExplainabilityMap;

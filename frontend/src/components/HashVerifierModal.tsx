@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { AuditLogEntry } from '../types';
+import {
+  Lock,
+  Link2,
+  Box,
+  Code2,
+  AlertTriangle,
+  CheckCircle2,
+  X
+} from 'lucide-react';
 
 interface HashVerifierModalProps {
   isOpen: boolean;
@@ -115,7 +124,7 @@ export const HashVerifierModal: React.FC<HashVerifierModalProps> = ({
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <span style={{ fontSize: '1.2rem' }}>🔒</span>
+            <Lock size={20} style={{ color: 'var(--status-normal)' }} />
             <div>
               <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#fff', fontWeight: 700 }}>
                 SHA-256 Cryptographic Block Hash Inspector
@@ -131,18 +140,20 @@ export const HashVerifierModal: React.FC<HashVerifierModalProps> = ({
               background: 'transparent',
               border: 'none',
               color: 'var(--text-muted)',
-              fontSize: '1.2rem',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}
           >
-            ✕
+            <X size={18} />
           </button>
         </div>
 
         {/* Body */}
         <div style={{ padding: '1.35rem', display: 'flex', flexDirection: 'column', gap: '1.15rem', maxHeight: '80vh', overflowY: 'auto' }}>
           {/* Blocks Overview Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
             {/* PARENT BLOCK */}
             <div
               style={{
@@ -153,8 +164,9 @@ export const HashVerifierModal: React.FC<HashVerifierModalProps> = ({
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                  🔗 PARENT BLOCK (H<sub>n-1</sub>)
+                <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <Link2 size={13} />
+                  PARENT BLOCK (H<sub>n-1</sub>)
                 </span>
                 {isGenesis && (
                   <span className="badge" style={{ background: 'rgba(59, 130, 246, 0.2)', color: '#60a5fa', borderColor: 'rgba(59, 130, 246, 0.4)', fontSize: '0.65rem' }}>
@@ -183,8 +195,9 @@ export const HashVerifierModal: React.FC<HashVerifierModalProps> = ({
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--accent-cyan)', textTransform: 'uppercase' }}>
-                  📦 CURRENT BLOCK (H<sub>n</sub>)
+                <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--accent-cyan)', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <Box size={13} />
+                  CURRENT BLOCK (H<sub>n</sub>)
                 </span>
                 <span className="mono" style={{ fontSize: '0.7rem', color: 'var(--accent-cyan)' }}>{selectedLog.id}</span>
               </div>
@@ -192,7 +205,7 @@ export const HashVerifierModal: React.FC<HashVerifierModalProps> = ({
                 Action: <strong style={{ color: '#4ade80' }}>{selectedLog.action_type}</strong>
               </div>
               <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
-                Actor: <span className="mono">{selectedLog.actor_type}:{selectedLog.actor_id}</span> • {new Date(selectedLog.timestamp).toLocaleTimeString()}
+                Actor: <span className="mono">{selectedLog.actor_type}:{selectedLog.actor_id}</span> &bull; {new Date(selectedLog.timestamp).toLocaleTimeString()}
               </div>
               <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', wordBreak: 'break-all' }}>
                 Stored Hash:
@@ -213,8 +226,9 @@ export const HashVerifierModal: React.FC<HashVerifierModalProps> = ({
               padding: '1rem'
             }}
           >
-            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent-cyan)', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
-              📐 VERIFICATION FORMULA & CANONICAL PAYLOAD
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent-cyan)', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
+              <Code2 size={14} />
+              <span>VERIFICATION FORMULA &amp; CANONICAL PAYLOAD</span>
             </div>
             <div className="mono" style={{ fontSize: '0.8rem', color: '#fff', background: 'rgba(0,0,0,0.4)', padding: '0.5rem', borderRadius: '4px', marginBottom: '0.75rem' }}>
               H<sub>n</sub> = SHA256( LogID | Timestamp | ActorType | ActorID | ActionType | DetailsJSON | H<sub>n-1</sub> )
@@ -245,7 +259,10 @@ export const HashVerifierModal: React.FC<HashVerifierModalProps> = ({
 
             {editablePayload !== canonicalPayload && (
               <div style={{ marginTop: '0.4rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.72rem', color: '#f59e0b' }}>⚠️ Payload modified (Simulating data tampering)</span>
+                <span style={{ fontSize: '0.72rem', color: '#f59e0b', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                  <AlertTriangle size={13} />
+                  Payload modified (Simulating data tampering)
+                </span>
                 <button
                   className="btn btn-outline"
                   onClick={() => {
@@ -269,12 +286,18 @@ export const HashVerifierModal: React.FC<HashVerifierModalProps> = ({
               padding: '1rem',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between'
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '0.75rem'
             }}
           >
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ fontSize: '1.4rem' }}>{isMatch ? '✅' : '🚨'}</span>
+                {isMatch ? (
+                  <CheckCircle2 size={24} style={{ color: '#4ade80' }} />
+                ) : (
+                  <AlertTriangle size={24} style={{ color: '#ef4444' }} />
+                )}
                 <div>
                   <div style={{ fontSize: '0.95rem', fontWeight: 700, color: isMatch ? '#4ade80' : '#ef4444' }}>
                     {isMatch ? 'CRYPTOGRAPHIC HASH VERIFIED (MATCH)' : 'HASH MISMATCH (INTEGRITY BREACH)'}
@@ -300,3 +323,5 @@ export const HashVerifierModal: React.FC<HashVerifierModalProps> = ({
     </div>
   );
 };
+
+export default HashVerifierModal;

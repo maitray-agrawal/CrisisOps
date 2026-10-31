@@ -3,6 +3,17 @@ import { apiService } from '../services/api';
 import { Machine, Incident, TelemetryRecord } from '../types';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorAlert } from '../components/ErrorAlert';
+import {
+  RotateCw,
+  Search,
+  Zap,
+  Bot,
+  Sparkles,
+  BookOpen,
+  TrendingUp,
+  ArrowRight,
+  AlertTriangle
+} from 'lucide-react';
 
 interface DashboardPageProps {
   onNavigateToIncident: (incidentId: string) => void;
@@ -41,7 +52,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   useEffect(() => {
     loadDashboardData(true);
 
-    // 3-second live polling interval
     const interval = setInterval(() => {
       loadDashboardData(false);
     }, 3000);
@@ -69,12 +79,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       <div className="page-header">
         <div>
           <h1 className="page-title">Operations Command Center</h1>
-          <p className="page-subtitle">Real-time Telemetry, Statistical Anomaly Detection & AI Incident Response</p>
+          <p className="page-subtitle">Real-time Telemetry, Statistical Anomaly Detection &amp; AI Incident Response</p>
         </div>
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
           <span className="mono" style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Last synced: Just now</span>
-          <button className="btn btn-outline" onClick={() => loadDashboardData(true)} style={{ fontSize: '0.8rem' }}>
-            🔄 Refresh Pipeline
+          <button className="btn btn-outline" onClick={() => loadDashboardData(true)} style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <RotateCw size={14} />
+            Refresh Pipeline
           </button>
         </div>
       </div>
@@ -86,7 +97,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.4rem' }}>
               <span className="badge badge-critical">CRITICAL SPOTLIGHT</span>
               <span className="mono" style={{ color: 'var(--status-critical)', fontWeight: 700 }}>{criticalIncidents[0].id}</span>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>• Asset: Machine M-204</span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>&bull; Asset: Machine M-204</span>
             </div>
             <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#fff', margin: '0 0 0.4rem 0' }}>
               {criticalIncidents[0].title}
@@ -94,9 +105,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             <p style={{ margin: 0, fontSize: '0.88rem', color: '#cbd5e1', lineHeight: '1.4' }}>
               {criticalIncidents[0].summary}
             </p>
-            <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.75rem', fontSize: '0.8rem' }}>
+            <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.75rem', fontSize: '0.8rem', flexWrap: 'wrap' }}>
               <div><span style={{ color: 'var(--text-muted)' }}>Vibration:</span> <strong className="mono" style={{ color: 'var(--status-critical)' }}>{latestM204Vibration.toFixed(2)} mm/s</strong></div>
-              <div><span style={{ color: 'var(--text-muted)' }}>Bearing Temp:</span> <strong className="mono" style={{ color: 'var(--status-critical)' }}>{latestM204Temp.toFixed(1)}°C</strong></div>
+              <div><span style={{ color: 'var(--text-muted)' }}>Bearing Temp:</span> <strong className="mono" style={{ color: 'var(--status-critical)' }}>{latestM204Temp.toFixed(1)}&deg;C</strong></div>
               <div><span style={{ color: 'var(--text-muted)' }}>Root Cause Confidence:</span> <strong style={{ color: 'var(--accent-cyan)' }}>89% (AI Agent)</strong></div>
             </div>
           </div>
@@ -104,16 +115,18 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             <button
               className="btn btn-primary"
               onClick={() => onNavigateToIncident(criticalIncidents[0].id)}
-              style={{ background: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)', boxShadow: '0 4px 14px rgba(239, 68, 68, 0.4)' }}
+              style={{ background: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)', boxShadow: '0 4px 14px rgba(239, 68, 68, 0.4)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
             >
-              🔍 Open AI Investigation Workflow
+              <Search size={14} />
+              Open AI Investigation Workflow
             </button>
             <button
               className="btn btn-outline"
               onClick={() => onNavigateToMachine('M-204')}
-              style={{ fontSize: '0.8rem' }}
+              style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
             >
-              ⚡ View M-204 Live Telemetry
+              <Zap size={14} />
+              View M-204 Live Telemetry
             </button>
           </div>
         </div>
@@ -170,28 +183,31 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       <div className="card ai-card-highlight" style={{ marginTop: '1.25rem', marginBottom: '1.25rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <span style={{ fontSize: '1.5rem' }}>🤖</span>
+            <Bot size={24} style={{ color: 'var(--accent-cyan)' }} />
             <div>
               <div style={{ fontWeight: 700, color: 'var(--accent-cyan)', fontSize: '0.95rem' }}>CrisisOps Copilot Shortcuts</div>
               <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Quick AI investigation prompts for shift operators</div>
             </div>
           </div>
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-            <button className="btn btn-outline" style={{ fontSize: '0.78rem', borderColor: 'rgba(6, 182, 212, 0.4)' }} onClick={() => onNavigateToIncident('INC-M204-001')}>
-              ✨ Summarize M-204 Root Cause
+            <button className="btn btn-outline" style={{ fontSize: '0.78rem', borderColor: 'rgba(6, 182, 212, 0.4)', display: 'flex', alignItems: 'center', gap: '0.35rem' }} onClick={() => onNavigateToIncident('INC-M204-001')}>
+              <Sparkles size={13} style={{ color: 'var(--accent-cyan)' }} />
+              Summarize M-204 Root Cause
             </button>
-            <button className="btn btn-outline" style={{ fontSize: '0.78rem', borderColor: 'rgba(6, 182, 212, 0.4)' }} onClick={() => onNavigateToIncident('INC-M204-001')}>
-              📖 Fetch Emergency SOP
+            <button className="btn btn-outline" style={{ fontSize: '0.78rem', borderColor: 'rgba(6, 182, 212, 0.4)', display: 'flex', alignItems: 'center', gap: '0.35rem' }} onClick={() => onNavigateToIncident('INC-M204-001')}>
+              <BookOpen size={13} style={{ color: 'var(--accent-cyan)' }} />
+              Fetch Emergency SOP
             </button>
-            <button className="btn btn-outline" style={{ fontSize: '0.78rem', borderColor: 'rgba(6, 182, 212, 0.4)' }} onClick={() => onNavigateToMachine('M-204')}>
-              📈 Check Vibration Z-Score
+            <button className="btn btn-outline" style={{ fontSize: '0.78rem', borderColor: 'rgba(6, 182, 212, 0.4)', display: 'flex', alignItems: 'center', gap: '0.35rem' }} onClick={() => onNavigateToMachine('M-204')}>
+              <TrendingUp size={13} style={{ color: 'var(--accent-cyan)' }} />
+              Check Vibration Z-Score
             </button>
           </div>
         </div>
       </div>
 
       {/* Fleet Overview & Recent Incidents Split */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1.25rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '1.25rem' }}>
         {/* Machine Status Table */}
         <div className="card">
           <div className="card-title">
@@ -203,7 +219,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               <thead>
                 <tr>
                   <th>Machine ID</th>
-                  <th>Name & Type</th>
+                  <th>Name &amp; Type</th>
                   <th>Location</th>
                   <th>Status</th>
                   <th>Action</th>
@@ -228,10 +244,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     <td>
                       <button
                         className="btn btn-outline"
-                        style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }}
+                        style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
                         onClick={() => onNavigateToMachine(machine.id)}
                       >
-                        Inspect Telemetry →
+                        <span>Inspect Telemetry</span>
+                        <ArrowRight size={12} />
                       </button>
                     </td>
                   </tr>
@@ -244,7 +261,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         {/* Active Incident List */}
         <div className="card">
           <div className="card-title">
-            <span>Active Incidents</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <AlertTriangle size={15} style={{ color: 'var(--status-critical)' }} />
+              <span>Active Incidents</span>
+            </div>
             <span className="badge badge-critical">{incidents.length} Open</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
@@ -268,9 +288,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                 <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#fff', marginBottom: '0.25rem' }}>
                   {incident.title}
                 </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span>Asset: {incident.machine_id}</span>
-                  <span style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>Investigate →</span>
+                  <span style={{ color: 'var(--accent-primary)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                    <span>Investigate</span>
+                    <ArrowRight size={12} />
+                  </span>
                 </div>
               </div>
             ))}
@@ -281,3 +304,4 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   );
 };
 
+export default DashboardPage;
